@@ -11,6 +11,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late IO.Socket socket;
+  var textController = TextEditingController();
+  var usernameController = TextEditingController();
 
   @override
   void initState() {
@@ -22,7 +24,6 @@ class _HomeScreenState extends State<HomeScreen> {
     // Get token from local storage
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-    print(token);
 
     socket = IO.io(
       "http://192.168.0.104:5000",
@@ -30,13 +31,53 @@ class _HomeScreenState extends State<HomeScreen> {
         {'Authorization': 'Bearer $token'},
       ).build(),
     );
+
+    socket.on('message', (data) {
+      // Show snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("message received-  " + data["text"]),
+        ),
+      );
+    });
+  }
+
+  void onSendButtonPressed() {
+    socket.emit("send-message", {
+      "text": textController.text,
+      "sendTo": usernameController.text,
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text("Hey"),
+      body: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: TextField(
+                controller: usernameController,
+                decoration: InputDecoration(
+                  hintText: 'Username',
+                ),
+              ),
+            ),
+          ),
+          TextField(
+            controller: textController,
+            decoration: InputDecoration(
+              hintText: 'Enter message',
+            ),
+            onSubmitted: (value) {
+              socket.emit('message', [value]);
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.send),
+            onPressed: onSendButtonPressed,
+          ),
+        ],
       ),
     );
   }

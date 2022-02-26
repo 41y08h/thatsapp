@@ -20,7 +20,7 @@ void main() async {
           TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
         }),
       ),
-      initialRoute: isAuthenticated ? "login" : "signup",
+      initialRoute: isAuthenticated ? "home" : "signup",
       routes: {
         "login": (context) => const LoginScreen(),
         "signup": (context) => const SignupScreen(),

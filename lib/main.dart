@@ -14,7 +14,13 @@ void main() async {
   runApp(
     MaterialApp(
       title: "ThatsApp",
-      initialRoute: isAuthenticated ? "home" : "signup",
+      theme: ThemeData(
+        pageTransitionsTheme: const PageTransitionsTheme(builders: {
+          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        }),
+      ),
+      initialRoute: isAuthenticated ? "login" : "signup",
       routes: {
         "login": (context) => const LoginScreen(),
         "signup": (context) => const SignupScreen(),

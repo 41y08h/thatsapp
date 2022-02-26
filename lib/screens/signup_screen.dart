@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -9,16 +13,17 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   var usernameController = TextEditingController();
+  var passwordController = TextEditingController();
 
-  void onSignupButtonPressed() {
+  void onSignupButtonPressed() async {
     http.Response response = await http.post(
-      Uri.parse("http://192.168.0.104:5000/register"),
+      Uri.parse("http://192.168.0.104:5000/auth/register"),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
-        'username': username,
-        'password': password,
+        'username': usernameController.text,
+        'password': passwordController.text,
       }),
     );
     final data = jsonDecode(response.body);
@@ -34,8 +39,7 @@ class _SignupScreenState extends State<SignupScreen> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("token", data["token"]);
 
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil("dashboard", (route) => false);
+    Navigator.of(context).pushNamedAndRemoveUntil("home", (route) => false);
   }
 
   @override
@@ -63,9 +67,26 @@ class _SignupScreenState extends State<SignupScreen> {
                   labelText: "Username",
                 ),
               ),
+              TextField(
+                obscureText: true,
+                enableSuggestions: false,
+                autocorrect: false,
+                controller: passwordController,
+                decoration: InputDecoration(
+                  labelText: "Password",
+                ),
+              ),
               TextButton(
-                  onPressed: onSignupButtonPressed,
-                  child: Text("Signup")),
+                  onPressed: onSignupButtonPressed, child: Text("Signup")),
+              SizedBox(
+                height: 40,
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pushReplacementNamed("login");
+                },
+                child: Text("Login instead"),
+              ),
             ],
           ),
         ),

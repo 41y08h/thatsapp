@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:thatsapp/screens/chat_screen.dart';
 import 'package:thatsapp/screens/home_screen.dart';
 import 'package:thatsapp/screens/login_screen.dart';
 import 'package:thatsapp/screens/signup_screen.dart';
@@ -25,6 +26,7 @@ void main() async {
         "login": (context) => const LoginScreen(),
         "signup": (context) => const SignupScreen(),
         "home": (context) => const HomeScreen(),
+        "chat": (context) => const ChatScreen(),
       },
     ),
   );

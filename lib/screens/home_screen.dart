@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:thatsapp/utils/chat_screen_arguments.dart';
+import 'package:thatsapp/ws/socket.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -10,7 +12,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late IO.Socket socket;
+  SocketConnection socketConnection = SocketConnection();
   var textController = TextEditingController();
   var usernameController = TextEditingController();
   List<String> chats = [];
@@ -31,18 +33,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void connectWebSockets() async {
-    // Get token from local storage
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    await socketConnection.initalize();
 
-    socket = IO.io(
-      "http://192.168.0.104:5000",
-      IO.OptionBuilder().setTransports(['websocket']).setExtraHeaders(
-        {'Authorization': 'Bearer $token'},
-      ).build(),
-    );
-
-    socket.on('message', (data) {
+    socketConnection.socket.on('message', (data) {
       // Show snackbar
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -53,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void onSendButtonPressed() {
-    socket.emit("send-message", {
+    socketConnection.socket.emit("send-message", {
       "text": textController.text,
       "sendTo": usernameController.text,
     });
@@ -92,7 +85,15 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ListView.builder(
           itemBuilder: (context, index) {
             return ListTile(
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  'chat',
+                  arguments: ChatScreenArguments(
+                    username: chats[index],
+                  ),
+                );
+              },
               title: Text(chats[index]),
             );
           },

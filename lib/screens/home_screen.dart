@@ -13,11 +13,21 @@ class _HomeScreenState extends State<HomeScreen> {
   late IO.Socket socket;
   var textController = TextEditingController();
   var usernameController = TextEditingController();
+  List<String> chats = [];
 
   @override
   void initState() {
     super.initState();
     connectWebSockets();
+    loadSavedChats();
+  }
+
+  void loadSavedChats() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var chats = prefs.getStringList('chats') ?? [];
+    setState(() {
+      this.chats = chats;
+    });
   }
 
   void connectWebSockets() async {
@@ -49,33 +59,86 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void onAddButtonPressed() {
+    // Show bottom sheet
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return AddChatDialog(
+          onSubmit: (username) async {
+            // Add username to list
+            setState(() {
+              chats.add(username);
+            });
+            // Save username to local storage
+            final prefs = await SharedPreferences.getInstance();
+            prefs.setStringList('chats', chats);
+            Navigator.of(context).pop();
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      appBar: AppBar(
+        title: Text("ThatsApp"),
+        elevation: 0,
+      ),
+      body: Center(
+        child: ListView.builder(
+          itemBuilder: (context, index) {
+            return ListTile(
+              onTap: () {},
+              title: Text(chats[index]),
+            );
+          },
+          itemCount: chats.length,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: onAddButtonPressed,
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+class AddChatDialog extends StatefulWidget {
+  final Function(String) onSubmit;
+  const AddChatDialog({
+    Key? key,
+    required this.onSubmit,
+  }) : super(key: key);
+
+  @override
+  State<AddChatDialog> createState() => _AddChatDialogState();
+}
+
+class _AddChatDialogState extends State<AddChatDialog> {
+  TextEditingController usernameController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: MediaQuery.of(context).viewInsets,
+      child: Column(
         children: [
-          Expanded(
-            child: Center(
-              child: TextField(
-                controller: usernameController,
-                decoration: InputDecoration(
-                  hintText: 'Username',
-                ),
-              ),
-            ),
-          ),
           TextField(
-            controller: textController,
+            autofocus: true,
+            controller: usernameController,
             decoration: InputDecoration(
-              hintText: 'Enter message',
+              labelText: "Username",
             ),
-            onSubmitted: (value) {
-              socket.emit('message', [value]);
-            },
           ),
-          IconButton(
-            icon: Icon(Icons.send),
-            onPressed: onSendButtonPressed,
+          TextButton(
+            onPressed: () {
+              widget.onSubmit(usernameController.text);
+            },
+            child: Text("Add"),
           ),
         ],
       ),

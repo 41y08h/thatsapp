@@ -10,9 +10,9 @@ class SocketConnection {
 
   SocketConnection._internal();
 
-  late IO.Socket socket;
+  IO.Socket? socket;
 
-  Future<void> initalize() async {
+  Future<void> initialize() async {
     // Get token from storage
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -23,5 +23,11 @@ class SocketConnection {
         {'Authorization': 'Bearer $token'},
       ).build(),
     );
+  }
+
+  Future<void> ensureInitalized() async {
+    if (socket == null) {
+      await initialize();
+    }
   }
 }

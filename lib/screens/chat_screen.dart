@@ -3,6 +3,7 @@ import 'package:thatsapp/utils/chat_screen_arguments.dart';
 import 'package:thatsapp/ws/socket.dart';
 
 class ChatScreen extends StatefulWidget {
+  static const routeName = 'chat';
   const ChatScreen({Key? key}) : super(key: key);
 
   @override
@@ -15,11 +16,11 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final args =
-        ModalRoute.of(context)?.settings.arguments as ChatScreenArguments;
+        ModalRoute.of(context)?.settings.arguments as Map<String, String>;
     return Scaffold(
       appBar: AppBar(
         // Show the username argument in the title
-        title: Text('Chat with ${args.username}'),
+        title: Text('${args['name']}'),
       ),
       body: Column(
         children: <Widget>[
@@ -48,9 +49,12 @@ class _ChatScreenState extends State<ChatScreen> {
                 IconButton(
                   icon: Icon(Icons.send),
                   onPressed: () {
-                    socketConnection.socket.emit(
+                    socketConnection.socket?.emit(
                       "send-message",
-                      {"text": messageController.text, "sendTo": args.username},
+                      {
+                        "text": messageController.text,
+                        "sendTo": args['username']
+                      },
                     );
                   },
                 ),

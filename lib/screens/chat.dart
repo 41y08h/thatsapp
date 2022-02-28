@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:thatsapp/provider/chat_provider.dart';
+import 'package:thatsapp/provider/chat.dart';
 import 'package:thatsapp/ws/socket.dart';
 import 'package:provider/provider.dart';
 

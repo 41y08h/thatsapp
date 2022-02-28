@@ -5,24 +5,25 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/provider/auth.dart';
-import 'package:thatsapp/screens/home_screen.dart';
+import 'package:thatsapp/screens/home.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+class SignupScreen extends StatefulWidget {
+  static const routeName = "signup";
+  const SignupScreen({Key? key}) : super(key: key);
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _SignupScreenState createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   var usernameController = TextEditingController();
   var passwordController = TextEditingController();
 
-  void onLoginButtonPressed() async {
+  void onSignupButtonPressed() async {
     final auth = context.read<AuthProvider>();
 
     try {
-      await auth.authenticate(AuthType.login,
+      await auth.authenticate(AuthType.register,
           username: usernameController.text, password: passwordController.text);
       Navigator.of(context)
           .pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false);
@@ -52,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               SizedBox(height: 40),
-              Text("Log into your account"),
+              Text("Signup to get started"),
               SizedBox(height: 40),
               TextField(
                 controller: usernameController,
@@ -69,15 +70,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   labelText: "Password",
                 ),
               ),
-              TextButton(onPressed: onLoginButtonPressed, child: Text("Login")),
+              TextButton(
+                  onPressed: onSignupButtonPressed, child: Text("Signup")),
               SizedBox(
                 height: 40,
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pushReplacementNamed("signup");
+                  Navigator.of(context).pushReplacementNamed("login");
                 },
-                child: Text("Signup instead"),
+                child: Text("Login instead"),
               ),
             ],
           ),

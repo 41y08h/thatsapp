@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:thatsapp/database.dart';
 import 'package:thatsapp/models/contact.dart';
 import 'package:thatsapp/widgets/add_contact_dialog.dart';
-import 'package:thatsapp/screens/chat_screen.dart';
+import 'package:thatsapp/screens/chat.dart';
 import 'package:thatsapp/utils/chat_screen_arguments.dart';
 
 class ContactsTabView extends StatefulWidget {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/provider/auth.dart';
-import 'package:thatsapp/screens/home_screen.dart';
-import 'package:thatsapp/screens/login_screen.dart';
+import 'package:thatsapp/screens/home.dart';
+import 'package:thatsapp/screens/login.dart';
 
 class LandingScreen extends StatelessWidget {
   static const routeName = '/';

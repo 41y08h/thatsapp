@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+// ignore: library_prefixes
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketConnection {
@@ -18,7 +19,7 @@ class SocketConnection {
     final token = prefs.getString('token');
 
     socket = IO.io(
-      "http://192.168.0.104:5000",
+      "http://192.168.0.101:5000",
       IO.OptionBuilder().setTransports(['websocket']).setExtraHeaders(
         {'Authorization': 'Bearer $token'},
       ).build(),

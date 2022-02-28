@@ -12,7 +12,7 @@ class ChatProvider extends ChangeNotifier {
     isLoading = false;
   }
 
-  addMessage(Message message) async {
+  void addMessage(Message message) async {
     final database = await DatabaseConnection().database;
     await database.insert(
       'Message',

@@ -15,7 +15,7 @@ class LandingScreen extends StatelessWidget {
         future: auth.verifyAuth(),
         builder: (context, AsyncSnapshot<bool> snapshot) {
           if (!snapshot.hasData) {
-            return Scaffold(
+            return const Scaffold(
               body: Center(
                 child: CircularProgressIndicator(),
               ),
@@ -23,9 +23,9 @@ class LandingScreen extends StatelessWidget {
           }
 
           if (snapshot.data == true) {
-            return HomeScreen();
+            return const HomeScreen();
           } else {
-            return LoginScreen();
+            return const LoginScreen();
           }
         },
       );

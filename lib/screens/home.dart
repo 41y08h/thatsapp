@@ -1,11 +1,9 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:thatsapp/models/message.dart';
 import 'package:thatsapp/provider/chat.dart';
-import 'package:thatsapp/screens/chat.dart';
-import 'package:thatsapp/utils/chat_screen_arguments.dart';
 import 'package:thatsapp/widgets/contacts_tabview.dart';
 import 'package:thatsapp/ws/socket.dart';
 
@@ -52,14 +50,14 @@ class _HomeScreenState extends State<HomeScreen> {
           title: Text("ThatsApp"),
           elevation: 0,
           bottom: TabBar(
-            tabs: [
+            tabs: const [
               Tab(icon: Icon(Icons.chat)),
               Tab(icon: Icon(Icons.group)),
             ],
           ),
         ),
         body: TabBarView(
-          children: [
+          children: const [
             Center(child: Text("Group")),
             ContactsTabView(),
           ],

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:thatsapp/models/message.dart';
+import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/provider/chat.dart';
+import 'package:thatsapp/utils/chat_screen_arguments.dart';
 import 'package:thatsapp/ws/socket.dart';
 import 'package:provider/provider.dart';
 
@@ -17,56 +20,74 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final chat = context.watch<ChatProvider>();
-
-    // Get messages where sender is current user
-
     final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, String>;
+        ModalRoute.of(context)?.settings.arguments as ChatScreenArguments;
+    final chat = context.watch<ChatProvider>();
+    final auth = context.watch<AuthProvider>();
+
+    final messages = chat.messages.where((message) {
+      bool isSecondPersonInvolved =
+          message.sender == args.username || message.receiver == args.username;
+      bool isFirstPersonInvolved =
+          message.sender == auth.currentUser?.username ||
+              message.receiver == auth.currentUser?.username;
+
+      return isFirstPersonInvolved && isSecondPersonInvolved;
+    }).toList();
+
+    void onSendMessage() {
+      final message = Message(
+        text: messageController.text,
+        sender: auth.currentUser?.username as String,
+        receiver: args.username,
+      );
+
+      socketConnection.socket?.emit(
+        "send-message",
+        {
+          "sendTo": message.receiver,
+          "text": message.text,
+        },
+      );
+
+      messageController.clear();
+      chat.addMessage(message);
+    }
+
     return Scaffold(
       appBar: AppBar(
         // Show the username argument in the title
-        title: Text('${args['name']}'),
+        title: Text(args.name),
       ),
       body: Column(
         children: <Widget>[
           Expanded(
               child: chat.isLoading
-                  ? Center(child: CircularProgressIndicator())
+                  ? const Center(child: CircularProgressIndicator())
                   : ListView.builder(
-                      itemCount: chat.messages.length,
+                      itemCount: messages.length,
                       itemBuilder: (context, index) {
                         return ListTile(
-                          title: Text(chat.messages[index].text),
+                          title: Text(messages[index].text),
                         );
                       },
                     )),
           // Add a button to send a message
-          Container(
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    controller: messageController,
-                    decoration: InputDecoration(
-                      hintText: 'Type a message',
-                    ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: TextField(
+                  controller: messageController,
+                  decoration: const InputDecoration(
+                    hintText: 'Type a message',
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {
-                    socketConnection.socket?.emit(
-                      "send-message",
-                      {
-                        "text": messageController.text,
-                        "sendTo": args['username']
-                      },
-                    );
-                  },
-                ),
-              ],
-            ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.send),
+                onPressed: onSendMessage,
+              ),
+            ],
           ),
         ],
       ),

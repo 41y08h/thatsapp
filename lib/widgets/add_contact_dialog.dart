@@ -24,14 +24,14 @@ class _AddContactDialogState extends State<AddContactDialog> {
           TextField(
             autofocus: true,
             controller: usernameController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: "Username",
             ),
           ),
           TextField(
             autofocus: true,
             controller: nameController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               labelText: "Name",
             ),
           ),
@@ -39,7 +39,7 @@ class _AddContactDialogState extends State<AddContactDialog> {
             onPressed: () {
               widget.onSubmit(usernameController.text, nameController.text);
             },
-            child: Text("Add"),
+            child: const Text("Add"),
           ),
         ],
       ),

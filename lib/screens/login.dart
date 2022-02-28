@@ -1,8 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/screens/home.dart';
@@ -45,19 +41,19 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 40),
-              Text(
+              const SizedBox(height: 40),
+              const Text(
                 "ThatsApp",
                 style: TextStyle(
                   fontSize: 20,
                 ),
               ),
-              SizedBox(height: 40),
-              Text("Log into your account"),
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
+              const Text("Log into your account"),
+              const SizedBox(height: 40),
               TextField(
                 controller: usernameController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Username",
                 ),
               ),
@@ -66,19 +62,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 enableSuggestions: false,
                 autocorrect: false,
                 controller: passwordController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Password",
                 ),
               ),
-              TextButton(onPressed: onLoginButtonPressed, child: Text("Login")),
-              SizedBox(
+              TextButton(
+                  onPressed: onLoginButtonPressed, child: const Text("Login")),
+              const SizedBox(
                 height: 40,
               ),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pushReplacementNamed("signup");
                 },
-                child: Text("Signup instead"),
+                child: const Text("Signup instead"),
               ),
             ],
           ),

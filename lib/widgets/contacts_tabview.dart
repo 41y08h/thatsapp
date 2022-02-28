@@ -65,20 +65,20 @@ class _ContactsTabViewState extends State<ContactsTabView> {
       child: Column(
         children: [
           TextButton(
-              onPressed: onAddContactButtonPressed, child: Text("Add Contact")),
+              onPressed: onAddContactButtonPressed,
+              child: const Text("Add Contact")),
           Expanded(
             child: ListView.builder(
               itemBuilder: (context, index) {
+                final contact = contacts[index];
                 return ListTile(
-                  title: Text(contacts[index].name),
-                  subtitle: Text(contacts[index].username),
+                  title: Text(contact.name),
+                  subtitle: Text(contact.username),
                   onTap: () {
                     Navigator.of(context).pushNamed(
                       ChatScreen.routeName,
-                      arguments: {
-                        "name": contacts[index].name,
-                        "username": contacts[index].username,
-                      },
+                      arguments: ChatScreenArguments(
+                          username: contact.username, name: contact.name),
                     );
                   },
                 );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:thatsapp/database.dart';
 import 'package:thatsapp/models/contact.dart';
-import 'package:thatsapp/provider/add_contact_dialog.dart';
+import 'package:thatsapp/widgets/add_contact_dialog.dart';
 import 'package:thatsapp/screens/chat_screen.dart';
 import 'package:thatsapp/utils/chat_screen_arguments.dart';
 
@@ -22,24 +22,23 @@ class _ContactsTabViewState extends State<ContactsTabView> {
   }
 
   void _getContacts() async {
-    await DatabaseConnection().ensureInitalized();
-    final result = await DatabaseConnection()
-        .instance
-        ?.query('Contact', columns: ['name', 'username']);
-    if (result != null) {
-      setState(() {
-        contacts = result.map((e) => Contact.fromMap(e)).toList();
-      });
-    }
+    final database = await DatabaseConnection().database;
+
+    final result =
+        await database.query('Contact', columns: ['name', 'username']);
+
+    setState(() {
+      contacts = result.map((e) => Contact.fromMap(e)).toList();
+    });
   }
 
-  void addContact(Contact contact) {
+  void addContact(Contact contact) async {
+    final database = await DatabaseConnection().database;
     setState(() {
       contacts.add(contact);
     });
 
-    // Add to database
-    DatabaseConnection().instance?.insert('Contact', {
+    database.insert('Contact', {
       'name': contact.name,
       'username': contact.username,
     });

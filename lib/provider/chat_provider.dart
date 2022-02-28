@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
-
-class Message {
-  final String text;
-  final String sender;
-  final String receiver;
-
-  Message(this.text, {required this.sender, required this.receiver});
-}
+import 'package:thatsapp/database.dart';
+import 'package:thatsapp/models/message.dart';
 
 class ChatProvider extends ChangeNotifier {
   List<Message> _messages = [];
   List<Message> get messages => _messages;
+  bool isLoading = true;
 
-  addMessage(Message message) {
-    _messages.add(message);
+  Future<void> loadMessages() async {
+    _messages = await DatabaseConnection().getMessages();
+    isLoading = false;
+  }
+
+  addMessage(Message message) async {
+    final database = await DatabaseConnection().database;
+    await database.insert(
+      'Message',
+      message.toMap(),
+    );
+
+    await loadMessages();
     notifyListeners();
   }
 }

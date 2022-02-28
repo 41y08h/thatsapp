@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:thatsapp/utils/chat_screen_arguments.dart';
+import 'package:thatsapp/provider/chat_provider.dart';
 import 'package:thatsapp/ws/socket.dart';
+import 'package:provider/provider.dart';
 
 class ChatScreen extends StatefulWidget {
   static const routeName = 'chat';
@@ -13,8 +14,13 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   SocketConnection socketConnection = SocketConnection();
   TextEditingController messageController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
+    final chat = context.watch<ChatProvider>();
+
+    // Get messages where sender is current user
+
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, String>;
     return Scaffold(
@@ -25,15 +31,16 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: <Widget>[
           Expanded(
-            child: ListView.builder(
-              itemCount: 20,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text('Message ${index + 1}'),
-                );
-              },
-            ),
-          ),
+              child: chat.isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: chat.messages.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(chat.messages[index].text),
+                        );
+                      },
+                    )),
           // Add a button to send a message
           Container(
             child: Row(

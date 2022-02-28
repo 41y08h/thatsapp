@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:thatsapp/provider/auth.dart';
+import 'package:thatsapp/screens/home_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -16,30 +19,20 @@ class _SignupScreenState extends State<SignupScreen> {
   var passwordController = TextEditingController();
 
   void onSignupButtonPressed() async {
-    http.Response response = await http.post(
-      Uri.parse("http://192.168.0.104:5000/auth/register"),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'username': usernameController.text,
-        'password': passwordController.text,
-      }),
-    );
-    final data = jsonDecode(response.body);
+    final auth = context.read<AuthProvider>();
 
-    if (response.statusCode != 201) {
-      // Show snackbar
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(data["error"]["message"]),
-      ));
-      return;
+    try {
+      await auth.authenticate(AuthType.register,
+          username: usernameController.text, password: passwordController.text);
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false);
+    } on ApiError catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.message),
+        ),
+      );
     }
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString("token", data["token"]);
-
-    Navigator.of(context).pushNamedAndRemoveUntil("home", (route) => false);
   }
 
   @override

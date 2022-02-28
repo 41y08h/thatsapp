@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:path/path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class User {
@@ -85,5 +87,20 @@ class AuthProvider extends ChangeNotifier {
     } on DioError catch (e) {
       throw ApiError.fromJson(e.response?.data);
     }
+  }
+
+  Future<bool> verifyAuth() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
+
+    if (token == null) {
+      return false;
+    }
+
+    final decoded = JwtDecoder.decode(token);
+    currentUser = User.fromJson(decoded);
+    notifyListeners();
+
+    return true;
   }
 }

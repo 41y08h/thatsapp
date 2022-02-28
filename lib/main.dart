@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/provider/auth.dart';
-import 'package:thatsapp/provider/chat.dart';
+import 'package:thatsapp/provider/messages.dart';
+import 'package:thatsapp/provider/contacts.dart';
 import 'package:thatsapp/screens/chat.dart';
 import 'package:thatsapp/screens/home.dart';
 import 'package:thatsapp/screens/landing.dart';
@@ -13,8 +14,9 @@ void main() async {
 
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (_) => ChatProvider()),
       ChangeNotifierProvider(create: (_) => AuthProvider()),
+      ChangeNotifierProvider(create: (_) => MessagesProvider()),
+      ChangeNotifierProvider(create: (_) => ContactsProvider()),
     ],
     child: MaterialApp(
       title: "ThatsApp",

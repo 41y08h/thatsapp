@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:thatsapp/models/message.dart';
 import 'package:thatsapp/provider/auth.dart';
-import 'package:thatsapp/provider/chat.dart';
+import 'package:thatsapp/provider/messages.dart';
 import 'package:thatsapp/utils/chat_screen_arguments.dart';
 import 'package:thatsapp/ws/socket.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +22,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)?.settings.arguments as ChatScreenArguments;
-    final chat = context.watch<ChatProvider>();
+    final chat = context.watch<MessagesProvider>();
     final auth = context.watch<AuthProvider>();
 
     final messages = chat.messages.where((message) {

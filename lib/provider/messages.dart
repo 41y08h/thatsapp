@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:thatsapp/database.dart';
 import 'package:thatsapp/models/message.dart';
 
-class ChatProvider extends ChangeNotifier {
+class MessagesProvider extends ChangeNotifier {
   List<Message> _messages = [];
   List<Message> get messages => _messages;
   bool isLoading = true;

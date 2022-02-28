@@ -3,7 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/models/message.dart';
-import 'package:thatsapp/provider/chat.dart';
+import 'package:thatsapp/provider/messages.dart';
+import 'package:thatsapp/widgets/chat_tabview.dart';
 import 'package:thatsapp/widgets/contacts_tabview.dart';
 import 'package:thatsapp/ws/socket.dart';
 
@@ -31,13 +32,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void loadMessages() {
-    context.read<ChatProvider>().loadMessages();
+    context.read<MessagesProvider>().loadMessages();
   }
 
   void registerSocketEvents() async {
     await socketConnection.ensureInitalized();
     socketConnection.socket?.on("message", (data) {
-      context.read<ChatProvider>().addMessage(Message.fromMap(data));
+      context.read<MessagesProvider>().addMessage(Message.fromMap(data));
     });
   }
 
@@ -58,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: TabBarView(
           children: const [
-            Center(child: Text("Group")),
+            ChatTabView(),
             ContactsTabView(),
           ],
         ),

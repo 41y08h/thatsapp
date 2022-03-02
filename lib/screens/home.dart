@@ -1,8 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/models/message.dart';
+import 'package:thatsapp/provider/contacts.dart';
 import 'package:thatsapp/provider/messages.dart';
 import 'package:thatsapp/widgets/chat_tabview.dart';
 import 'package:thatsapp/widgets/contacts_tabview.dart';
@@ -28,6 +30,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     socketConnection.initialize();
     registerSocketEvents();
+    getContacts();
+  }
+
+  void getContacts() {
+    context.read<ContactsProvider>().getContacts();
   }
 
   void registerSocketEvents() async {
@@ -39,6 +46,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final contacts = context.watch<ContactsProvider>().contacts;
+    final getContacts = context.read<ContactsProvider>().getContacts;
+
+    final chats = context.watch<MessagesProvider>().chats;
+    final getChats = context.read<MessagesProvider>().getChats;
+
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -53,8 +66,21 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         body: TabBarView(
-          children: const [
-            ChatTabView(),
+          children: [
+            FutureBuilder(
+                future: Future.wait([getContacts(), getChats(context)]),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  return ChatTabView(
+                    contacts: contacts,
+                    chats: chats,
+                  );
+                }),
             ContactsTabView(),
           ],
         ),

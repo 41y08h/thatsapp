@@ -22,7 +22,7 @@ class LandingScreen extends StatelessWidget {
             );
           }
 
-          if (snapshot.data == false) {
+          if (snapshot.data == true) {
             return const HomeScreen();
           } else {
             return const LoginScreen();

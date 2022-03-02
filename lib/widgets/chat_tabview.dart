@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:thatsapp/database.dart';
-import 'package:thatsapp/models/message.dart';
-import 'package:thatsapp/provider/auth.dart';
-import 'package:thatsapp/provider/contacts.dart';
+import 'package:thatsapp/models/contact.dart';
 import 'package:thatsapp/provider/messages.dart';
-import 'package:provider/provider.dart';
-import 'package:collection/collection.dart';
+import 'package:thatsapp/screens/chat.dart';
+import 'package:thatsapp/utils/chat_screen_arguments.dart';
 
 class ChatTabView extends StatefulWidget {
-  const ChatTabView({Key? key}) : super(key: key);
+  final List<Contact> contacts;
+  final List<Chat> chats;
+  const ChatTabView({Key? key, required this.contacts, required this.chats})
+      : super(key: key);
 
   @override
   _ChatTabViewState createState() => _ChatTabViewState();
@@ -17,28 +17,24 @@ class ChatTabView extends StatefulWidget {
 class _ChatTabViewState extends State<ChatTabView> {
   @override
   Widget build(BuildContext context) {
-    final chats = context.watch<MessagesProvider>().chats;
-    final getChats = context.watch<MessagesProvider>().getChats;
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        final chat = widget.chats[index];
 
-    return Container(
-      child: FutureBuilder(
-          future: getChats(context),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-
-            return ListView.builder(
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(chats[index]),
-                );
-              },
-              itemCount: chats.length,
+        return ListTile(
+          title: Text(chat.alias),
+          onTap: () {
+            Navigator.of(context).pushNamed(
+              ChatScreen.routeName,
+              arguments: ChatScreenArguments(
+                username: chat.recipient,
+                name: chat.alias,
+              ),
             );
-          }),
+          },
+        );
+      },
+      itemCount: widget.chats.length,
     );
   }
 }

@@ -32,6 +32,7 @@ class _ContactsTabViewState extends State<ContactsTabView> {
 
   @override
   Widget build(BuildContext context) {
+    final contacts = context.watch<ContactsProvider>().contacts;
     return Center(
         child: Column(
       children: [
@@ -48,7 +49,7 @@ class _ContactsTabViewState extends State<ContactsTabView> {
 
                 return ListView.builder(
                   itemBuilder: (context, index) {
-                    final contact = snapshot.data![index];
+                    final contact = contacts[index];
                     return ListTile(
                       title: Text(contact.name),
                       subtitle: Text(contact.username),

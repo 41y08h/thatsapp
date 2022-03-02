@@ -3,7 +3,7 @@ import 'package:path/path.dart' as p;
 import 'package:thatsapp/models/message.dart';
 
 class DatabaseConnection {
-  static const _filename = 'thatsapp_database2.db';
+  static const _filename = 'thatsapp_database3.db';
   static final DatabaseConnection _instance = DatabaseConnection._();
   DatabaseConnection._();
 

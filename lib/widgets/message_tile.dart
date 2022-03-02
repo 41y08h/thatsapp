@@ -12,16 +12,19 @@ class MessageTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(18),
-      decoration: BoxDecoration(
-          color: Colors.yellow.shade500,
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(isSentByUser ? 15 : 0),
-              topRight: Radius.circular(isSentByUser ? 0 : 15),
-              bottomLeft: Radius.circular(15),
-              bottomRight: Radius.circular(15))),
-      child: Text(message.text),
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      return Container(
+        padding: EdgeInsets.all(14),
+        decoration: BoxDecoration(
+            color: Colors.yellow.shade500,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(isSentByUser ? 10 : 0),
+                topRight: Radius.circular(isSentByUser ? 0 : 10),
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10))),
+        child: Text(message.text),
+        constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.7),
+      );
+    });
   }
 }

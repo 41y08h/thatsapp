@@ -93,7 +93,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         );
                       },
                       separatorBuilder: (context, index) {
-                        return SizedBox(height: 5);
+                        return SizedBox(height: 12);
                       },
                     ),
                   );

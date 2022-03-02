@@ -7,6 +7,8 @@ import 'package:thatsapp/models/message.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/provider/contacts.dart';
 import 'package:thatsapp/provider/messages.dart';
+import 'package:thatsapp/screens/landing.dart';
+import 'package:thatsapp/screens/login.dart';
 import 'package:thatsapp/widgets/chat_tabview.dart';
 import 'package:thatsapp/widgets/contacts_tabview.dart';
 import 'package:thatsapp/ws/socket.dart';
@@ -60,13 +62,35 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text("ThatsApp"),
-          elevation: 0,
           bottom: TabBar(
             tabs: const [
               Tab(icon: Icon(Icons.chat)),
               Tab(icon: Icon(Icons.group)),
             ],
           ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.search),
+              onPressed: () {},
+            ),
+            PopupMenuButton(
+              itemBuilder: (context) {
+                return [
+                  PopupMenuItem(
+                    child: Text("Logout"),
+                    value: "logout",
+                  ),
+                ];
+              },
+              onSelected: (value) {
+                if (value == "logout") {
+                  context.read<AuthProvider>().logout();
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, LandingScreen.routeName, (route) => false);
+                }
+              },
+            ),
+          ],
         ),
         body: TabBarView(
           children: [

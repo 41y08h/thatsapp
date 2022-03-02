@@ -102,4 +102,12 @@ class AuthProvider extends ChangeNotifier {
 
     return true;
   }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove("token");
+
+    currentUser = null;
+    notifyListeners();
+  }
 }

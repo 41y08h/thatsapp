@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:thatsapp/models/message.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/provider/messages.dart';
@@ -23,8 +24,7 @@ class _ChatScreenState extends State<ChatScreen> {
   FocusNode inputNode = FocusNode();
 
   void dismissKeyboard() {
-    FocusManager.instance.primaryFocus?.unfocus();
-    inputNode.requestFocus();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
   }
 
   void focusInput() {
@@ -44,10 +44,16 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void onEmojiSelected(Emoji emoji) {
-    messageController
-      ..text += emoji.emoji
-      ..selection = TextSelection.fromPosition(
-          TextPosition(offset: messageController.text.length));
+    // get cursor position from text field
+    final int cursorPos = messageController.selection.baseOffset;
+    // insert emoji to the text field at the cursor position
+    messageController.text = messageController.text.substring(0, cursorPos) +
+        emoji.emoji +
+        messageController.text.substring(cursorPos);
+
+    messageController.selection = TextSelection.fromPosition(
+      TextPosition(offset: cursorPos + emoji.emoji.length),
+    );
   }
 
   void onBackspacePressed() {

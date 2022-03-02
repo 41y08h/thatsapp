@@ -30,7 +30,10 @@ class MessagesProvider extends ChangeNotifier {
     final database = await DatabaseConnection().database;
     await database.insert(
       'Message',
-      message.toMap(),
+      {
+        ...message.toMap(),
+        'created_at': DateTime.now().toIso8601String(),
+      },
     );
 
     messages.add(message);

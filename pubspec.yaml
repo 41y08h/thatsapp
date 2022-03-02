@@ -44,6 +44,7 @@ dependencies:
   jwt_decoder: ^2.0.1
   dio: ^4.0.4
   emoji_picker_flutter: ^1.1.2
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:

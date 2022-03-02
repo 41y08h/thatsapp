@@ -3,14 +3,15 @@ class Message {
   final String text;
   final String sender;
   final String receiver;
-  final DateTime? createdAt;
+  final DateTime createdAt;
 
-  Message(
-      {this.id,
-      required this.text,
-      required this.sender,
-      required this.receiver,
-      this.createdAt});
+  Message({
+    this.id,
+    required this.text,
+    required this.sender,
+    required this.receiver,
+    required this.createdAt,
+  });
 
   factory Message.fromMap(Map<String, dynamic> json) {
     return Message(
@@ -18,6 +19,7 @@ class Message {
       text: json['text'],
       sender: json['sender'],
       receiver: json['receiver'],
+      createdAt: DateTime.parse(json['created_at']),
     );
   }
 
@@ -26,6 +28,6 @@ class Message {
         'text': text,
         'sender': sender,
         'receiver': receiver,
-        'created_at': createdAt,
+        'created_at': createdAt.toIso8601String(),
       };
 }

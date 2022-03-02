@@ -3,7 +3,7 @@ import 'package:path/path.dart' as p;
 import 'package:thatsapp/models/message.dart';
 
 class DatabaseConnection {
-  static const _filename = 'thatsapp_database5.db';
+  static const _filename = 'thatsapp_database8.db';
   static final DatabaseConnection _instance = DatabaseConnection._();
   DatabaseConnection._();
 
@@ -23,10 +23,10 @@ class DatabaseConnection {
     await db.execute('''
       CREATE TABLE Message (
         id INTEGER PRIMARY KEY, 
-        text TEXT, 
-        sender TEXT, 
-        receiver TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        text TEXT not null, 
+        sender TEXT not null, 
+        receiver TEXT not null,
+        created_at TEXT not null
       )
       ''');
 

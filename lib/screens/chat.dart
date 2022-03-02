@@ -85,6 +85,7 @@ class _ChatScreenState extends State<ChatScreen> {
         text: messageController.text,
         sender: auth.currentUser?.username as String,
         receiver: args.username,
+        createdAt: DateTime.now(),
       );
 
       socketConnection.socket?.emit(
@@ -181,7 +182,6 @@ class _ChatScreenState extends State<ChatScreen> {
                         onTap: () {
                           closeEmojiPicker();
                         },
-                        autofocus: true,
                         focusNode: inputNode,
                         controller: messageController,
                         decoration: InputDecoration(

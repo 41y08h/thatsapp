@@ -43,8 +43,15 @@ class _HomeScreenState extends State<HomeScreen> {
   void registerSocketEvents() async {
     await socketConnection.ensureInitalized();
     socketConnection.socket?.on("message", (data) {
-      context.read<MessagesProvider>().addMessage(Message.fromMap(data));
+      context.read<MessagesProvider>().addMessage(Message.fromMap(
+          {...data, 'created_at': DateTime.now().toIso8601String()}));
     });
+  }
+
+  @override
+  void dispose() {
+    socketConnection.socket?.off('message');
+    super.dispose();
   }
 
   @override

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:thatsapp/models/message.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class MessageTile extends StatelessWidget {
   final Message message;
@@ -12,9 +13,11 @@ class MessageTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final MessageText = Text(message.text);
+
     return LayoutBuilder(builder: (context, constraints) {
       return Container(
-        padding: EdgeInsets.all(14),
+        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
             color: isSentByUser ? Color(0xffD9FDD3) : Colors.white,
             borderRadius: BorderRadius.only(
@@ -30,7 +33,20 @@ class MessageTile extends StatelessWidget {
                 offset: const Offset(0, 1), // changes position of shadow
               ),
             ]),
-        child: Text(message.text),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(message.text),
+            SizedBox(height: 5),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Text(
+                DateFormat('hh:mm a').format(message.createdAt).toLowerCase(),
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ),
+          ],
+        ),
         constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.7),
       );
     });

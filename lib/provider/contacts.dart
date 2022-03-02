@@ -18,12 +18,13 @@ class ContactsProvider extends ChangeNotifier {
 
   Future<void> addContact(Contact contact) async {
     final db = await DatabaseConnection().database;
-    _contacts.add(contact);
 
     await db.insert('Contact', {
       'name': contact.name,
       'username': contact.username,
     });
+
+    _contacts.add(contact);
 
     notifyListeners();
   }

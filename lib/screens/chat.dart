@@ -62,16 +62,25 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: <Widget>[
           Expanded(
-              child: chat.isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView.builder(
-                      itemCount: messages.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(messages[index].text),
-                        );
-                      },
-                    )),
+            child: FutureBuilder(
+                future: chat.getMessages(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+
+                  return ListView.builder(
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(messages[index].text),
+                      );
+                    },
+                  );
+                }),
+          ),
           // Add a button to send a message
           Row(
             children: <Widget>[

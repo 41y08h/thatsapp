@@ -44,4 +44,21 @@ class DatabaseConnection {
     final messages = await db.query('Message');
     return messages.map((m) => Message.fromMap(m)).toList();
   }
+
+  Future<List<String>> getRecipients(String username) async {
+    final db = await database;
+    final recipients = await db.rawQuery('''
+      select
+      case sender
+          when ? then receiver
+          else sender
+      end recipient
+      from Message
+      group by recipient
+      ''', [username]);
+
+    return recipients
+        .map((recipient) => recipient['recipient'].toString())
+        .toList();
+  }
 }

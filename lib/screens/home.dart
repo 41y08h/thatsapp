@@ -28,11 +28,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     socketConnection.initialize();
     registerSocketEvents();
-    loadMessages();
-  }
-
-  void loadMessages() {
-    context.read<MessagesProvider>().loadMessages();
   }
 
   void registerSocketEvents() async {

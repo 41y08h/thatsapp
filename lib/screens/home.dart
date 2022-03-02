@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/models/message.dart';
+import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/provider/contacts.dart';
 import 'package:thatsapp/provider/messages.dart';
 import 'package:thatsapp/widgets/chat_tabview.dart';
@@ -46,6 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = context.watch<AuthProvider>().currentUser;
+
     final contacts = context.watch<ContactsProvider>().contacts;
     final getContacts = context.read<ContactsProvider>().getContacts;
 
@@ -68,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body: TabBarView(
           children: [
             FutureBuilder(
-                future: Future.wait([getContacts(), getChats(context)]),
+                future: getContacts(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return Center(
@@ -76,10 +79,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     );
                   }
 
-                  return ChatTabView(
-                    contacts: contacts,
-                    chats: chats,
-                  );
+                  return FutureBuilder(
+                      future:
+                          getChats(contacts, currentUser?.username as String),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        return ChatTabView(
+                          contacts: contacts,
+                          chats: chats,
+                        );
+                      });
                 }),
             ContactsTabView(),
           ],

@@ -3,6 +3,7 @@ import 'package:thatsapp/models/message.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/provider/messages.dart';
 import 'package:thatsapp/utils/chat_screen_arguments.dart';
+import 'package:thatsapp/widgets/message_tile.dart';
 import 'package:thatsapp/ws/socket.dart';
 import 'package:provider/provider.dart';
 
@@ -71,13 +72,30 @@ class _ChatScreenState extends State<ChatScreen> {
                     );
                   }
 
-                  return ListView.builder(
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(messages[index].text),
-                      );
-                    },
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: ListView.separated(
+                      reverse: true,
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        final message = messages.reversed.toList()[index];
+                        final isSentByUser =
+                            message.sender == auth.currentUser?.username;
+
+                        return Align(
+                          alignment: isSentByUser
+                              ? Alignment.topRight
+                              : Alignment.topLeft,
+                          child: MessageTile(
+                            isSentByUser: isSentByUser,
+                            message: message,
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return SizedBox(height: 5);
+                      },
+                    ),
                   );
                 }),
           ),

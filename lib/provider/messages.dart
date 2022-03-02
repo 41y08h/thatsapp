@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/provider/contacts.dart';
 import 'package:collection/collection.dart';
+import 'package:thatsapp/models/contact.dart';
 
 class Chat {
   final String alias;
@@ -37,12 +38,8 @@ class MessagesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<List<Chat>> getChats(BuildContext context) async {
-    final auth = context.read<AuthProvider>();
-    final contacts = context.read<ContactsProvider>().contacts;
-
-    final recipients = await DatabaseConnection()
-        .getRecipients(auth.currentUser?.username as String);
+  Future<List<Chat>> getChats(List<Contact> contacts, String username) async {
+    final recipients = await DatabaseConnection().getRecipients(username);
 
     final chats = recipients.map((recipient) {
       final contact = contacts.firstWhereOrNull(

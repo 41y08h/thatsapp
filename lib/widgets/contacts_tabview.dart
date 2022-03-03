@@ -22,7 +22,7 @@ class _ContactsTabViewState extends State<ContactsTabView> {
         return AddContactDialog(
           onSubmit: (username, name) async {
             final contacts = context.read<ContactsProvider>();
-            contacts.addContact(Contact(username, name));
+            contacts.addContact(Contact(name: name, username: username));
             Navigator.of(context).pop();
           },
         );

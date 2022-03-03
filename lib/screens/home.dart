@@ -95,23 +95,6 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: Icon(Icons.search),
               onPressed: () {},
             ),
-            PopupMenuButton(
-              itemBuilder: (context) {
-                return [
-                  PopupMenuItem(
-                    child: Text("Logout"),
-                    value: "logout",
-                  ),
-                ];
-              },
-              onSelected: (value) {
-                if (value == "logout") {
-                  context.read<AuthProvider>().logout();
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, LandingScreen.routeName, (route) => false);
-                }
-              },
-            ),
           ],
         ),
         body: TabBarView(

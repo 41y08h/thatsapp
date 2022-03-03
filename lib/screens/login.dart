@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/screens/home.dart';
+import 'package:thatsapp/utils/api.dart';
 
 class LoginScreen extends StatefulWidget {
   static const routeName = 'login';

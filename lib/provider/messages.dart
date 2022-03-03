@@ -26,19 +26,14 @@ class MessagesProvider extends ChangeNotifier {
     return _messages;
   }
 
-  void addMessage(Message message) async {
+  Future<int> addMessage(Message message) async {
     final database = await DatabaseConnection().database;
-    await database.insert(
-      'Message',
-      {
-        ...message.toMap(),
-        'created_at': DateTime.now().toIso8601String(),
-      },
-    );
+    int insertedId = await database.insert('Message', message.toMap());
 
     messages.add(message);
 
     notifyListeners();
+    return insertedId;
   }
 
   Future<List<Chat>> getChats(List<Contact> contacts, String username) async {

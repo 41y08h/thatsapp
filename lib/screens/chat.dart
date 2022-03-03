@@ -80,7 +80,7 @@ class _ChatScreenState extends State<ChatScreen> {
       return isFirstPersonInvolved && isSecondPersonInvolved;
     }).toList();
 
-    void onSendMessage() {
+    void onSendMessage() async {
       final message = Message(
         text: messageController.text,
         sender: auth.currentUser?.username as String,
@@ -88,16 +88,20 @@ class _ChatScreenState extends State<ChatScreen> {
         createdAt: DateTime.now(),
       );
 
+      int id = await chat.addMessage(message);
+
       socketConnection.socket?.emit(
         "send-message",
         {
+          "id": id,
           "sendTo": message.receiver,
           "text": message.text,
+          "createdAt": message.createdAt.toIso8601String()
         },
       );
+      print("creation receipt: ${message.createdAt.toIso8601String()}");
 
       messageController.clear();
-      chat.addMessage(message);
     }
 
     return Scaffold(

@@ -45,6 +45,10 @@ class MessageTile extends StatelessWidget {
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ),
+            Visibility(
+                child: Icon(
+                    message.deliveredAt == null ? Icons.done : Icons.done_all),
+                visible: isSentByUser),
           ],
         ),
         constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.7),

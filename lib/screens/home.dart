@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
+import 'package:thatsapp/database.dart';
 import 'package:thatsapp/models/message.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/provider/contacts.dart';
@@ -42,9 +43,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void registerSocketEvents() async {
     await socketConnection.ensureInitalized();
-    socketConnection.socket?.on("message", (data) {
-      context.read<MessagesProvider>().addMessage(Message.fromMap(
-          {...data, 'created_at': DateTime.now().toIso8601String()}));
+    final socket = socketConnection.socket;
+    socket?.on("message", (data) {
+      context.read<MessagesProvider>().addMessage(Message.fromMap(data));
+
+      socket.emit("delivery-receipt",
+          {'receiptFor': data['sender'], 'messageId': data['id']});
+    });
+    socket?.on('delivery-receipt', (data) async {
+      print(data);
+      final db = await DatabaseConnection().database;
+
+      int updated = await db.update(
+          'Message', {'delivered_at': DateTime.now().toIso8601String()},
+          where: 'delivered_at is null and id = ?',
+          whereArgs: [data['messageId']]);
+
+      print('updated: $updated');
     });
   }
 

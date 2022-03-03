@@ -12,7 +12,7 @@ import 'package:thatsapp/screens/signup.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  runApp(App());
+  runApp(const App());
 }
 
 class App extends StatelessWidget {
@@ -32,7 +32,7 @@ class App extends StatelessWidget {
         title: "ThatsApp",
         theme: ThemeData(
           primarySwatch: Colors.green,
-          appBarTheme: AppBarTheme(elevation: 0),
+          appBarTheme: const AppBarTheme(elevation: 0),
           pageTransitionsTheme: const PageTransitionsTheme(builders: {
             TargetPlatform.android: CupertinoPageTransitionsBuilder(),
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),

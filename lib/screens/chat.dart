@@ -5,7 +5,7 @@ import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/provider/messages.dart';
 import 'package:thatsapp/utils/chat_screen_arguments.dart';
 import 'package:thatsapp/widgets/message_tile.dart';
-import 'package:thatsapp/ws/socket.dart';
+import 'package:thatsapp/socket.dart';
 import 'package:provider/provider.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 

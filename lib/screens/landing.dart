@@ -14,7 +14,7 @@ class LandingScreen extends StatelessWidget {
       return FutureBuilder(
         future: auth.verifyAuth(),
         builder: (context, AsyncSnapshot<bool> snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState != ConnectionState.done) {
             return const Scaffold(
               body: Center(
                 child: CircularProgressIndicator(),
@@ -22,11 +22,9 @@ class LandingScreen extends StatelessWidget {
             );
           }
 
-          if (snapshot.data == true) {
-            return const HomeScreen();
-          } else {
-            return const LoginScreen();
-          }
+          bool isAuthenticated =
+              snapshot.hasData ? snapshot.data as bool : false;
+          return isAuthenticated ? const HomeScreen() : const LoginScreen();
         },
       );
     });

@@ -12,7 +12,7 @@ import 'package:thatsapp/screens/landing.dart';
 import 'package:thatsapp/screens/login.dart';
 import 'package:thatsapp/widgets/chat_tabview.dart';
 import 'package:thatsapp/widgets/contacts_tabview.dart';
-import 'package:thatsapp/ws/socket.dart';
+import 'package:thatsapp/socket.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = 'home';

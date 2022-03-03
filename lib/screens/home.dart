@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void getContacts() {
-    context.read<ContactsProvider>().getContacts();
+    context.read<ContactsProvider>().retrieveContacts();
   }
 
   void registerSocketEvents() async {
@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final currentUser = context.watch<AuthProvider>().currentUser;
 
     final contacts = context.watch<ContactsProvider>().contacts;
-    final getContacts = context.read<ContactsProvider>().getContacts;
+    final retrieveContacts = context.read<ContactsProvider>().retrieveContacts;
 
     final chats = context.watch<MessagesProvider>().chats;
     final getChats = context.read<MessagesProvider>().getChats;
@@ -100,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body: TabBarView(
           children: [
             FutureBuilder(
-                future: getContacts(),
+                future: retrieveContacts(),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return Center(

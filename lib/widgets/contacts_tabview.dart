@@ -42,9 +42,9 @@ class _ContactsTabViewState extends State<ContactsTabView> {
         ),
         Expanded(
           child: FutureBuilder(
-              future: context.read<ContactsProvider>().getContacts(),
-              builder: (context, AsyncSnapshot<List<Contact>> snapshot) {
-                if (!snapshot.hasData)
+              future: context.read<ContactsProvider>().retrieveContacts(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.done)
                   return const Center(child: CircularProgressIndicator());
 
                 return ListView.builder(
@@ -62,7 +62,7 @@ class _ContactsTabViewState extends State<ContactsTabView> {
                       },
                     );
                   },
-                  itemCount: snapshot.data!.length,
+                  itemCount: contacts.length,
                 );
               }),
         ),

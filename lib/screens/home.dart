@@ -1,18 +1,16 @@
-// ignore_for_file: prefer_const_constructors
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/database.dart';
+import 'package:thatsapp/models/contact.dart';
 import 'package:thatsapp/models/message.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/provider/contacts.dart';
-import 'package:thatsapp/provider/messages.dart';
-import 'package:thatsapp/screens/landing.dart';
-import 'package:thatsapp/screens/login.dart';
-import 'package:thatsapp/widgets/chat_tabview.dart';
+import 'package:thatsapp/utils/conversation.dart';
+import 'package:thatsapp/utils/user.dart';
 import 'package:thatsapp/widgets/contacts_tabview.dart';
 import 'package:thatsapp/socket.dart';
+import 'package:collection/collection.dart';
+import 'package:thatsapp/widgets/conversations_tabview.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = 'home';
@@ -23,76 +21,89 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  SocketConnection socketConnection = SocketConnection();
-  var textController = TextEditingController();
-  var usernameController = TextEditingController();
-  List<String> chats = [];
+  List<Conversation> conversations = [];
+  late final Future<List<Conversation>> fConversations = fetchConversations();
+  late final Future<List<Contact>> fContacts =
+      context.read<ContactsProvider>().fetch();
 
   @override
   void initState() {
     super.initState();
-
-    socketConnection.initialize();
-    registerSocketEvents();
-    getContacts();
+    SocketConnection().initialize();
+    registerWebsocketEvents();
   }
 
-  void getContacts() {
-    context.read<ContactsProvider>().retrieveContacts();
+  void registerWebsocketEvents() async {
+    final socket = await SocketConnection().socket;
+
+    socket.on("message", wsOnMessage);
+    socket.on("delivery-receipt", wsOnDeliveryReceipt);
   }
 
-  void registerSocketEvents() async {
-    await socketConnection.ensureInitalized();
-    final socket = socketConnection.socket;
-    socket?.on("message", (data) {
-      context.read<MessagesProvider>().addMessage(Message.fromMap(data));
+  void wsOnMessage(dynamic data) async {
+    final message = Message.fromMap(data);
+    int messageId = await DatabaseConnection().insertMessage(data);
 
-      socket.emit("delivery-receipt",
-          {'receiptFor': data['sender'], 'messageId': data['id']});
+    final socket = await SocketConnection().socket;
+    socket.emit("delivery-receipt", {
+      'messageId': messageId,
+      'receiptFor': message.sender,
     });
-    socket?.on('delivery-receipt', (data) async {
-      print(data);
-      final db = await DatabaseConnection().database;
+  }
 
-      int updated = await db.update(
-          'Message', {'delivered_at': DateTime.now().toIso8601String()},
-          where: 'delivered_at is null and id = ?',
-          whereArgs: [data['messageId']]);
+  void wsOnDeliveryReceipt(dynamic data) async {
+    final messageId = data['messageId'];
+    final receiptFrom = data['receiptFrom'];
+    DatabaseConnection().updateMessageDeliveryTime(messageId, receiptFrom);
+  }
 
-      print('updated: $updated');
-    });
+  Future<List<Conversation>> fetchConversations() async {
+    final contacts = await fContacts;
+    final currentUser = context.read<AuthProvider>().currentUser as User;
+
+    final recipients =
+        await DatabaseConnection().getRecipients(currentUser.username);
+
+    final conversations = recipients.map((recipient) {
+      final contact = contacts.firstWhereOrNull(
+        (contact) => contact.username == recipient,
+      );
+
+      // If the recipient is not in contacts, show their username
+      return Conversation(
+        name: contact == null ? recipient : contact.name,
+        recipient: recipient,
+      );
+    }).toList();
+
+    this.conversations = conversations;
+    return conversations;
   }
 
   @override
   void dispose() {
-    socketConnection.socket?.off('message');
+    SocketConnection().socket.then((socket) => socket.dispose());
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = context.watch<AuthProvider>().currentUser;
-
     final contacts = context.watch<ContactsProvider>().contacts;
-    final retrieveContacts = context.read<ContactsProvider>().retrieveContacts;
-
-    final chats = context.watch<MessagesProvider>().chats;
-    final getChats = context.read<MessagesProvider>().getChats;
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("ThatsApp"),
-          bottom: TabBar(
-            tabs: const [
+          title: const Text("ThatsApp"),
+          bottom: const TabBar(
+            tabs: [
               Tab(icon: Icon(Icons.chat)),
               Tab(icon: Icon(Icons.group)),
             ],
           ),
           actions: [
             IconButton(
-              icon: Icon(Icons.search),
+              icon: const Icon(Icons.search),
               onPressed: () {},
             ),
           ],
@@ -100,31 +111,29 @@ class _HomeScreenState extends State<HomeScreen> {
         body: TabBarView(
           children: [
             FutureBuilder(
-                future: retrieveContacts(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-
-                  return FutureBuilder(
-                      future:
-                          getChats(contacts, currentUser?.username as String),
-                      builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-
-                        return ChatTabView(
-                          contacts: contacts,
-                          chats: chats,
-                        );
-                      });
-                }),
-            ContactsTabView(),
+              future: fConversations,
+              builder: (context, AsyncSnapshot<List<Conversation>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return ConversationsTabView(conversations: conversations);
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
+            ),
+            FutureBuilder(
+              future: fContacts,
+              builder: (context, AsyncSnapshot<List<Contact>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return ContactsTabView(contacts: contacts);
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
+            )
           ],
         ),
       ),

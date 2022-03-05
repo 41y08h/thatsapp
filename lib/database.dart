@@ -41,6 +41,22 @@ class DatabaseConnection {
       ''');
   }
 
+  Future<int> insertMessage(Message message) async {
+    final db = await database;
+    return db.insert('Message', message.toMap());
+  }
+
+  Future<void> updateMessageDeliveryTime(
+      int messageId, String recipient) async {
+    final db = await database;
+    await db.update(
+      'Message',
+      {'delivered_at': DateTime.now().toIso8601String()},
+      where: 'delivered_at is null and id = ? and receiver = ?',
+      whereArgs: [messageId, recipient],
+    );
+  }
+
   Future<List<Message>> getMessages() async {
     final db = await database;
     final messages = await db.query('Message');

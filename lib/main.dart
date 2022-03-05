@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/provider/auth.dart';
+import 'package:thatsapp/provider/contacts2.dart';
 import 'package:thatsapp/provider/messages.dart';
 import 'package:thatsapp/provider/contacts.dart';
 import 'package:thatsapp/screens/chat.dart';
@@ -8,15 +9,17 @@ import 'package:thatsapp/screens/home.dart';
 import 'package:thatsapp/screens/landing.dart';
 import 'package:thatsapp/screens/login.dart';
 import 'package:thatsapp/screens/signup.dart';
+import 'package:thatsapp/utils/globals.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await App.init();
 
-  runApp(const App());
+  runApp(const MyApp());
 }
 
-class App extends StatelessWidget {
-  const App({
+class MyApp extends StatelessWidget {
+  const MyApp({
     Key? key,
   }) : super(key: key);
 
@@ -27,6 +30,7 @@ class App extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => MessagesProvider()),
         ChangeNotifierProvider(create: (_) => ContactsProvider()),
+        ChangeNotifierProvider(create: (_) => Contacts2Provider()),
       ],
       child: MaterialApp(
         title: "ThatsApp",

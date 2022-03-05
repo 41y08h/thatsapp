@@ -6,33 +6,28 @@ import 'package:thatsapp/widgets/add_contact_dialog.dart';
 import 'package:thatsapp/screens/chat.dart';
 import 'package:thatsapp/utils/chat_screen_arguments.dart';
 
-class ContactsTabView extends StatefulWidget {
-  const ContactsTabView({Key? key}) : super(key: key);
-
-  @override
-  _ContactsTabViewState createState() => _ContactsTabViewState();
-}
-
-class _ContactsTabViewState extends State<ContactsTabView> {
-  void onAddContactButtonPressed() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return AddContactDialog(
-          onSubmit: (username, name) async {
-            final contacts = context.read<ContactsProvider>();
-            contacts.addContact(Contact(name: name, username: username));
-            Navigator.of(context).pop();
-          },
-        );
-      },
-    );
-  }
+class ContactsTabView extends StatelessWidget {
+  final List<Contact> contacts;
+  const ContactsTabView({Key? key, required this.contacts}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final contacts = context.watch<ContactsProvider>().contacts;
+    void onAddContactButtonPressed() {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (BuildContext context) {
+          return AddContactDialog(
+            onSubmit: (username, name) async {
+              final contacts = context.read<ContactsProvider>();
+              contacts.addContact(Contact(name: name, username: username));
+              Navigator.of(context).pop();
+            },
+          );
+        },
+      );
+    }
+
     return Center(
         child: Column(
       children: [
@@ -41,31 +36,24 @@ class _ContactsTabViewState extends State<ContactsTabView> {
           child: const Text("Add Contact"),
         ),
         Expanded(
-          child: FutureBuilder(
-              future: context.read<ContactsProvider>().retrieveContacts(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState != ConnectionState.done)
-                  return const Center(child: CircularProgressIndicator());
-
-                return ListView.builder(
-                  itemBuilder: (context, index) {
-                    final contact = contacts[index];
-                    return ListTile(
-                      title: Text(contact.name),
-                      subtitle: Text(contact.username),
-                      onTap: () {
-                        Navigator.of(context).pushNamed(
-                          ChatScreen.routeName,
-                          arguments: ChatScreenArguments(
-                              username: contact.username, name: contact.name),
-                        );
-                      },
-                    );
-                  },
-                  itemCount: contacts.length,
-                );
-              }),
-        ),
+          child: ListView.builder(
+            itemBuilder: (context, index) {
+              final contact = contacts[index];
+              return ListTile(
+                title: Text(contact.name),
+                subtitle: Text(contact.username),
+                onTap: () {
+                  Navigator.of(context).pushNamed(
+                    ChatScreen.routeName,
+                    arguments: ChatScreenArguments(
+                        username: contact.username, name: contact.name),
+                  );
+                },
+              );
+            },
+            itemCount: contacts.length,
+          ),
+        )
       ],
     ));
   }

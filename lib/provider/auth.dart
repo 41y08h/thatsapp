@@ -31,17 +31,17 @@ class AuthProvider extends ChangeNotifier {
   bool isAuthenticating = false;
   User? currentUser;
 
-  Future<void> _saveToken(String token) async {
+  static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("token", token);
   }
 
-  Future<String?> _getToken() async {
+  static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString("token");
   }
 
-  User _decodeUserFromToken(String token) {
+  static User _decodeUserFromToken(String token) {
     final decoded = JwtDecoder.decode(token);
     return User.fromJson(decoded);
   }
@@ -66,7 +66,7 @@ class AuthProvider extends ChangeNotifier {
 
       // Save token and update current user
       final data = AuthResponseData.fromJson(response.data);
-      _saveToken(data.token);
+      saveToken(data.token);
       currentUser = data.user;
 
       notifyListeners();
@@ -77,7 +77,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<bool> verifyAuth() async {
     // No token found ~ Unauthenticated
-    final token = await _getToken();
+    final token = await getToken();
     if (token == null) {
       return false;
     }

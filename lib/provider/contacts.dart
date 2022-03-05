@@ -6,14 +6,13 @@ class ContactsProvider with ChangeNotifier {
   List<Contact> _contacts = [];
   List<Contact> get contacts => _contacts;
 
-  Future<void> retrieveContacts() async {
+  Future<List<Contact>> fetch() async {
     final db = await DatabaseConnection().database;
-    final contacts = await db
-        .query('Contact')
-        .then((contacts) => contacts.map(Contact.fromMap).toList());
+    final contacts = await db.query('Contact');
+    _contacts = contacts.map(Contact.fromMap).toList();
 
-    _contacts = contacts;
     notifyListeners();
+    return _contacts;
   }
 
   Future<void> addContact(Contact contact) async {

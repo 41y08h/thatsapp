@@ -1,8 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/screens/home.dart';
 import 'package:thatsapp/utils/api.dart';
+
+class Notification {
+  static final _notifications = FlutterLocalNotificationsPlugin();
+
+  static Future _notificationsDetails() async {
+    return const NotificationDetails(
+      android: AndroidNotificationDetails(
+        "channel id",
+        "channel name",
+        channelDescription: "channel description",
+        largeIcon: DrawableResourceAndroidBitmap("app_icon"),
+        styleInformation: MediaStyleInformation(
+          htmlFormatContent: true,
+          htmlFormatTitle: true,
+        ),
+        color: Colors.deepOrange,
+        enableLights: true,
+        enableVibration: true,
+        ongoing: true,
+      ),
+    );
+  }
+
+  static Future initialize() async {
+    _notifications.initialize(const InitializationSettings(
+      android: AndroidInitializationSettings('app_icon'),
+    ));
+  }
+
+  static Future showNofitication({
+    int id = 0,
+    String? title,
+    String? body,
+    String? payload,
+  }) async =>
+      {_notifications.show(id, title, body, await _notificationsDetails())};
+}
 
 class LoginScreen extends StatefulWidget {
   static const routeName = 'login';
@@ -16,25 +54,34 @@ class _LoginScreenState extends State<LoginScreen> {
   var usernameController = TextEditingController();
   var passwordController = TextEditingController();
 
-  void onLoginButtonPressed() async {
-    final auth = context.read<AuthProvider>();
-
-    try {
-      await auth.authenticate(AuthType.login,
-          username: usernameController.text, password: passwordController.text);
-      Navigator.of(context)
-          .pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false);
-    } on ApiError catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.message),
-        ),
-      );
-    }
+  @override
+  void initState() {
+    super.initState();
+    Notification.initialize();
   }
 
   @override
   Widget build(BuildContext context) {
+    void onLoginButtonPressed() async {
+      // Show a simple notification saying hi
+
+      Notification.showNofitication(title: "Mummy", body: "Hello");
+      return;
+      final auth = context.read<AuthProvider>();
+
+      try {
+        await auth.authenticate(AuthType.login,
+            username: usernameController.text,
+            password: passwordController.text);
+      } on ApiError catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+          ),
+        );
+      }
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Padding(

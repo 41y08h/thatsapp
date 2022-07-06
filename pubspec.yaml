@@ -45,6 +45,8 @@ dependencies:
   dio: ^4.0.4
   emoji_picker_flutter: ^1.1.2
   intl: ^0.17.0
+  flutter_requery: ^0.1.14
+  flutter_local_notifications: ^9.4.0
 
 dev_dependencies:
   flutter_test:

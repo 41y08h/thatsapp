@@ -1,9 +1,11 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
+import 'package:thatsapp/models/contact.dart';
 import 'package:thatsapp/models/message.dart';
+import 'package:thatsapp/utils/recipient.dart';
 
 class DatabaseConnection {
-  static const _filename = 'thatsapp_database11.db';
+  static const _filename = 'thatsapp_database12.db';
   static final DatabaseConnection _instance = DatabaseConnection._();
   DatabaseConnection._();
 
@@ -63,20 +65,50 @@ class DatabaseConnection {
     return messages.map((m) => Message.fromMap(m)).toList();
   }
 
-  Future<List<String>> getRecipients(String username) async {
+  /// Returns a list of [Message] objects for the given [Recipient] username.
+  Future<List<Message>> getChatMessages(
+      String currentUsername, String recipient) async {
+    print("hey");
+    final db = await database;
+    final messages = await db.query(
+      'Message',
+      where: '(receiver = ? and sender = ?) or (sender = ? and receiver = ?)',
+      whereArgs: [currentUsername, recipient, currentUsername, recipient],
+      orderBy: 'created_at',
+    );
+    return messages.map(Message.fromMap).toList();
+  }
+
+  /// Returns a list of [Recipient] (or name if the contact is saved) that are in conversation with the current user.
+  Future<List<Recipient>> getRecipients(String username) async {
+    print("object");
     final db = await database;
     final recipients = await db.rawQuery('''
-      select
-      case sender
-          when ? then receiver
-          else sender
-      end recipient
-      from Message
-      group by recipient
+      SELECT coalesce(name, second_person) as name, second_person as username
+      from (
+          select Contact.name,
+          case Message.sender
+            when ? then receiver
+            ELSE Message.receiver
+          END second_person
+        FROM Message
+        LEFT join Contact on Contact.username = second_person
+      )
+      GROUP by name
       ''', [username]);
 
-    return recipients
-        .map((recipient) => recipient['recipient'].toString())
-        .toList();
+    return recipients.map(Recipient.fromMap).toList();
+  }
+
+  /// Adds a contact to the database.
+  Future<void> addContact(String name, String username) async {
+    final db = await database;
+    await db.insert('Contact', {'name': name, 'username': username});
+  }
+
+  Future<List<Contact>> getContacts() async {
+    final db = await database;
+    final contacts = await db.query('Contact');
+    return contacts.map(Contact.fromMap).toList();
   }
 }

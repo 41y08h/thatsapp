@@ -4,13 +4,13 @@ import 'package:thatsapp/database.dart';
 import 'package:thatsapp/models/contact.dart';
 import 'package:thatsapp/models/message.dart';
 import 'package:thatsapp/provider/auth.dart';
-import 'package:thatsapp/provider/contacts.dart';
-import 'package:thatsapp/utils/conversation.dart';
+import 'package:thatsapp/screens/login.dart';
+import 'package:thatsapp/utils/recipient.dart';
 import 'package:thatsapp/utils/user.dart';
 import 'package:thatsapp/widgets/contacts_tabview.dart';
 import 'package:thatsapp/socket.dart';
-import 'package:collection/collection.dart';
 import 'package:thatsapp/widgets/conversations_tabview.dart';
+import 'package:flutter_requery/flutter_requery.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = 'home';
@@ -21,10 +21,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Conversation> conversations = [];
-  late final Future<List<Conversation>> fConversations = fetchConversations();
-  late final Future<List<Contact>> fContacts =
-      context.read<ContactsProvider>().fetch();
+  Future<List<Recipient>> fetchRecipients() async {
+    final currentUser = context.read<AuthProvider>().currentUser as User;
+    return DatabaseConnection().getRecipients(currentUser.username);
+  }
 
   @override
   void initState() {
@@ -43,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void wsOnMessage(dynamic data) async {
     final message = Message.fromMap(data);
     int messageId = await DatabaseConnection().insertMessage(data);
+    queryCache.invalidateQueries(['messages', message.sender]);
 
     final socket = await SocketConnection().socket;
     socket.emit("delivery-receipt", {
@@ -57,29 +58,6 @@ class _HomeScreenState extends State<HomeScreen> {
     DatabaseConnection().updateMessageDeliveryTime(messageId, receiptFrom);
   }
 
-  Future<List<Conversation>> fetchConversations() async {
-    final contacts = await fContacts;
-    final currentUser = context.read<AuthProvider>().currentUser as User;
-
-    final recipients =
-        await DatabaseConnection().getRecipients(currentUser.username);
-
-    final conversations = recipients.map((recipient) {
-      final contact = contacts.firstWhereOrNull(
-        (contact) => contact.username == recipient,
-      );
-
-      // If the recipient is not in contacts, show their username
-      return Conversation(
-        name: contact == null ? recipient : contact.name,
-        recipient: recipient,
-      );
-    }).toList();
-
-    this.conversations = conversations;
-    return conversations;
-  }
-
   @override
   void dispose() {
     SocketConnection().socket.then((socket) => socket.dispose());
@@ -88,8 +66,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final contacts = context.watch<ContactsProvider>().contacts;
-
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -104,34 +80,50 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: [
             IconButton(
               icon: const Icon(Icons.search),
-              onPressed: () {},
+              onPressed: () {
+                queryCache.invalidateQueries("recipients");
+              },
+            ),
+            IconButton(
+              onPressed: () {
+                // Navigate to login page
+                Navigator.of(context).pushNamed(LoginScreen.routeName);
+              },
+              icon: Icon(Icons.login),
             ),
           ],
         ),
         body: TabBarView(
           children: [
-            FutureBuilder(
-              future: fConversations,
-              builder: (context, AsyncSnapshot<List<Conversation>> snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return ConversationsTabView(conversations: conversations);
-                } else {
-                  return const Center(
+            Query<List<Recipient>>("recipients", future: fetchRecipients,
+                builder: (context, response) {
+              if (response.error != null) {
+                return Center(
+                  child: Text("Error :("),
+                );
+              }
+              if (response.loading) {
+                return SizedBox();
+              }
+              return ConversationsTabView(
+                  recipients: response.data as List<Recipient>);
+            }),
+            Query<List<Contact>>(
+              "contacts",
+              future: DatabaseConnection().getContacts,
+              builder: (context, response) {
+                if (response.error != null) {
+                  return Center(
+                    child: Text("Error :("),
+                  );
+                }
+                if (response.loading) {
+                  return Center(
                     child: CircularProgressIndicator(),
                   );
                 }
-              },
-            ),
-            FutureBuilder(
-              future: fContacts,
-              builder: (context, AsyncSnapshot<List<Contact>> snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return ContactsTabView(contacts: contacts);
-                } else {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+                return ContactsTabView(
+                    contacts: response.data as List<Contact>);
               },
             )
           ],

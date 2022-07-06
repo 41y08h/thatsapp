@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_requery/flutter_requery.dart';
 import 'package:provider/provider.dart';
+import 'package:thatsapp/database.dart';
 import 'package:thatsapp/models/contact.dart';
-import 'package:thatsapp/provider/contacts.dart';
+import 'package:thatsapp/utils/recipient.dart';
 import 'package:thatsapp/widgets/add_contact_dialog.dart';
 import 'package:thatsapp/screens/chat.dart';
-import 'package:thatsapp/utils/chat_screen_arguments.dart';
 
 class ContactsTabView extends StatelessWidget {
   final List<Contact> contacts;
@@ -19,8 +20,8 @@ class ContactsTabView extends StatelessWidget {
         builder: (BuildContext context) {
           return AddContactDialog(
             onSubmit: (username, name) async {
-              final contacts = context.read<ContactsProvider>();
-              contacts.addContact(Contact(name: name, username: username));
+              DatabaseConnection().addContact(name, username);
+              queryCache.invalidateQueries(["contacts", "recipients"]);
               Navigator.of(context).pop();
             },
           );
@@ -45,8 +46,10 @@ class ContactsTabView extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).pushNamed(
                     ChatScreen.routeName,
-                    arguments: ChatScreenArguments(
-                        username: contact.username, name: contact.name),
+                    arguments: Recipient(
+                      username: contact.username,
+                      name: contact.name,
+                    ),
                   );
                 },
               );

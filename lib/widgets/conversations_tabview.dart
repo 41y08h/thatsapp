@@ -1,33 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:thatsapp/screens/chat.dart';
-import 'package:thatsapp/utils/chat_screen_arguments.dart';
-import 'package:thatsapp/utils/conversation.dart';
+import 'package:thatsapp/utils/recipient.dart';
 
 class ConversationsTabView extends StatelessWidget {
-  final List<Conversation> conversations;
-  const ConversationsTabView({Key? key, required this.conversations})
+  final List<Recipient> recipients;
+  const ConversationsTabView({Key? key, required this.recipients})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       itemBuilder: (context, index) {
-        final conversation = conversations[index];
+        final conversation = recipients[index];
 
         return ListTile(
           title: Text(conversation.name),
           onTap: () {
             Navigator.of(context).pushNamed(
               ChatScreen.routeName,
-              arguments: ChatScreenArguments(
-                username: conversation.recipient,
+              arguments: Recipient(
+                username: conversation.username,
                 name: conversation.name,
               ),
             );
           },
         );
       },
-      itemCount: conversations.length,
+      itemCount: recipients.length,
     );
   }
 }

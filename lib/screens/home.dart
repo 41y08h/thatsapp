@@ -87,7 +87,9 @@ class _HomeScreenState extends State<HomeScreen> {
             IconButton(
               onPressed: () {
                 // Navigate to login page
-                Navigator.of(context).pushNamed(LoginScreen.routeName);
+                context.read<AuthProvider>().logout();
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    LoginScreen.routeName, (route) => false);
               },
               icon: Icon(Icons.login),
             ),

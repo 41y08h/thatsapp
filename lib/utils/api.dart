@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-const kApiBaseUrl = "http://192.168.0.101:5000/";
+const kApiBaseUrl = "http://192.168.1.6:5000/";
 
 class ApiError implements Exception {
   final String message;
@@ -22,7 +22,5 @@ class ApiError implements Exception {
 }
 
 final dio = Dio(
-  BaseOptions(
-    baseUrl: "http://192.168.0.101:5000/",
-  ),
+  BaseOptions(baseUrl: kApiBaseUrl),
 );

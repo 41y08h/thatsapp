@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/screens/home.dart';
 import 'package:thatsapp/utils/api.dart';
+
+import '../widgets/form_input.dart';
 
 class Notification {
   static final _notifications = FlutterLocalNotificationsPlugin();
@@ -64,15 +67,14 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     void onLoginButtonPressed() async {
       // Show a simple notification saying hi
-
-      Notification.showNofitication(title: "Mummy", body: "Hello");
-      return;
       final auth = context.read<AuthProvider>();
 
       try {
         await auth.authenticate(AuthType.login,
             username: usernameController.text,
             password: passwordController.text);
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false);
       } on ApiError catch (error) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -84,48 +86,75 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(40.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 40),
-              const Text(
-                "ThatsApp",
-                style: TextStyle(
-                  fontSize: 20,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 32),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: SizedBox(
+                    height: 240,
+                    child: ClipOval(
+                        child: Image.asset("images/multimedia_doodle.jpg")),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 40),
-              const Text("Log into your account"),
-              const SizedBox(height: 40),
-              TextField(
-                controller: usernameController,
-                decoration: const InputDecoration(
-                  labelText: "Username",
+                const SizedBox(height: 24),
+                const Text(
+                  "ThatsApp",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
-              ),
-              TextField(
-                obscureText: true,
-                enableSuggestions: false,
-                autocorrect: false,
-                controller: passwordController,
-                decoration: const InputDecoration(
-                  labelText: "Password",
+                const SizedBox(height: 4),
+                const Text("Log into your account"),
+                const SizedBox(height: 40),
+                FormInput(
+                    controller: usernameController, placeholder: "Username"),
+                const SizedBox(
+                  height: 6,
                 ),
-              ),
-              TextButton(
-                  onPressed: onLoginButtonPressed, child: const Text("Login")),
-              const SizedBox(
-                height: 40,
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pushReplacementNamed("signup");
-                },
-                child: const Text("Signup instead"),
-              ),
-            ],
+                FormInput(
+                    controller: passwordController,
+                    placeholder: "Password",
+                    isPassword: true),
+                const SizedBox(
+                  height: 12,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CupertinoButton(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(100)),
+                        color: Color.fromRGBO(7, 94, 84, 1),
+                        onPressed: onLoginButtonPressed,
+                        child: const Text(
+                          "Sign in",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Center(
+                  child: CupertinoButton(
+                    onPressed: () {
+                      Navigator.of(context).pushReplacementNamed("signup");
+                    },
+                    child: const Text(
+                      "Create account",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

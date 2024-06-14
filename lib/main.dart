@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: "ThatsApp",
         theme: ThemeData(
+          scaffoldBackgroundColor: Colors.white,
           primarySwatch: Colors.green,
           appBarTheme: const AppBarTheme(elevation: 0),
           pageTransitionsTheme: const PageTransitionsTheme(builders: {

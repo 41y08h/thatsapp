@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/screens/home.dart';
 import 'package:thatsapp/utils/api.dart';
+import 'package:thatsapp/widgets/form_input.dart';
 
 class SignupScreen extends StatefulWidget {
   static const routeName = "signup";
@@ -37,49 +39,80 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(40.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 40),
-              const Text(
-                "ThatsApp",
-                style: TextStyle(
-                  fontSize: 20,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 22),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: SizedBox(
+                    height: 240,
+                    child: ClipOval(
+                        child: Image.asset("images/multimedia_doodle.jpg")),
+                  ),
                 ),
-              ),
-              const SizedBox(height: 40),
-              const Text("Signup to get started"),
-              const SizedBox(height: 40),
-              TextField(
-                controller: usernameController,
-                decoration: const InputDecoration(
-                  labelText: "Username",
+                const SizedBox(height: 24),
+                const Text(
+                  "ThatsApp",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
-              ),
-              TextField(
-                obscureText: true,
-                enableSuggestions: false,
-                autocorrect: false,
-                controller: passwordController,
-                decoration: const InputDecoration(
-                  labelText: "Password",
+                const SizedBox(height: 4),
+                const Text("Log into your account"),
+                const SizedBox(height: 40),
+                FormInput(
+                    controller: usernameController, placeholder: "Full name"),
+                const SizedBox(
+                  height: 6,
                 ),
-              ),
-              TextButton(
-                  onPressed: onSignupButtonPressed,
-                  child: const Text("Signup")),
-              const SizedBox(
-                height: 40,
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pushReplacementNamed("login");
-                },
-                child: const Text("Login instead"),
-              ),
-            ],
+                FormInput(
+                    controller: usernameController, placeholder: "Username"),
+                const SizedBox(
+                  height: 6,
+                ),
+                FormInput(
+                    controller: passwordController,
+                    placeholder: "Password",
+                    isPassword: true),
+                const SizedBox(
+                  height: 12,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CupertinoButton(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(100)),
+                        color: Color.fromRGBO(7, 94, 84, 1),
+                        onPressed: onSignupButtonPressed,
+                        child: const Text(
+                          "Sign up",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Center(
+                  child: CupertinoButton(
+                    onPressed: () {
+                      Navigator.of(context).pushReplacementNamed("login");
+                    },
+                    child: const Text(
+                      "Sign in",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

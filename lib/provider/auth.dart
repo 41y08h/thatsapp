@@ -46,6 +46,34 @@ class AuthProvider extends ChangeNotifier {
     return User.fromJson(decoded);
   }
 
+  Future<void> signup({
+    required String name,
+    required String username,
+    required String password,
+  }) async {
+    isAuthenticating = true;
+    notifyListeners();
+
+    try {
+      final response = await dio.post(
+        '/auth/register',
+        data: {
+          'name': name,
+          'username': username,
+          'password': password,
+        },
+      );
+
+      // Save token and update current user
+      final data = AuthResponseData.fromJson(response.data);
+      saveToken(data.token);
+      currentUser = data.user;
+      notifyListeners();
+    } on DioError catch (e) {
+      throw ApiError.fromJson(e.response?.data);
+    }
+  }
+
   Future<void> authenticate(
     AuthType type, {
     required String username,

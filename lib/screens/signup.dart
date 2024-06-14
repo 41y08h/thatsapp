@@ -15,6 +15,7 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  var nameController = TextEditingController();
   var usernameController = TextEditingController();
   var passwordController = TextEditingController();
 
@@ -22,8 +23,11 @@ class _SignupScreenState extends State<SignupScreen> {
     final auth = context.read<AuthProvider>();
 
     try {
-      await auth.authenticate(AuthType.register,
-          username: usernameController.text, password: passwordController.text);
+      await auth.signup(
+        name: nameController.text,
+        username: usernameController.text,
+        password: passwordController.text,
+      );
       Navigator.of(context)
           .pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false);
     } on ApiError catch (error) {
@@ -59,22 +63,27 @@ class _SignupScreenState extends State<SignupScreen> {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 4),
-                const Text("Log into your account"),
+                const Text("Create a new account"),
                 const SizedBox(height: 40),
                 FormInput(
-                    controller: usernameController, placeholder: "Full name"),
+                  controller: nameController,
+                  placeholder: "Full name",
+                ),
                 const SizedBox(
                   height: 6,
                 ),
                 FormInput(
-                    controller: usernameController, placeholder: "Username"),
+                  controller: usernameController,
+                  placeholder: "Username",
+                ),
                 const SizedBox(
                   height: 6,
                 ),
                 FormInput(
-                    controller: passwordController,
-                    placeholder: "Password",
-                    isPassword: true),
+                  controller: passwordController,
+                  placeholder: "Password",
+                  isPassword: true,
+                ),
                 const SizedBox(
                   height: 12,
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/provider/messages.dart';
@@ -12,6 +13,11 @@ import 'package:thatsapp/utils/globals.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await App.init();
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.white,
+    statusBarBrightness: Brightness.dark,
+    statusBarIconBrightness: Brightness.dark,
+  ));
 
   runApp(const MyApp());
 }
@@ -39,6 +45,7 @@ class MyApp extends StatelessWidget {
             TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
           }),
         ),
+        debugShowCheckedModeBanner: false,
         initialRoute: LandingScreen.routeName,
         routes: {
           LandingScreen.routeName: (context) => const LandingScreen(),

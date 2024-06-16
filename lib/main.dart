@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fquery/fquery.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/provider/messages.dart';
@@ -22,6 +23,8 @@ void main() async {
   runApp(const MyApp());
 }
 
+final client = QueryClient();
+
 class MyApp extends StatelessWidget {
   const MyApp({
     Key? key,
@@ -34,26 +37,29 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => MessagesProvider()),
       ],
-      child: MaterialApp(
-        title: "ThatsApp",
-        theme: ThemeData(
-          scaffoldBackgroundColor: Colors.white,
-          primarySwatch: Colors.green,
-          appBarTheme: const AppBarTheme(elevation: 0),
-          pageTransitionsTheme: const PageTransitionsTheme(builders: {
-            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-            TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-          }),
+      child: QueryClientProvider(
+        queryClient: client,
+        child: MaterialApp(
+          title: "ThatsApp",
+          theme: ThemeData(
+            scaffoldBackgroundColor: Colors.white,
+            primarySwatch: Colors.green,
+            appBarTheme: const AppBarTheme(elevation: 0),
+            pageTransitionsTheme: const PageTransitionsTheme(builders: {
+              TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+            }),
+          ),
+          debugShowCheckedModeBanner: false,
+          initialRoute: LandingScreen.routeName,
+          routes: {
+            LandingScreen.routeName: (context) => const LandingScreen(),
+            LoginScreen.routeName: (context) => const LoginScreen(),
+            SignupScreen.routeName: (context) => const SignupScreen(),
+            HomeScreen.routeName: (context) => const HomeScreen(),
+            ChatScreen.routeName: (context) => const ChatScreen(),
+          },
         ),
-        debugShowCheckedModeBanner: false,
-        initialRoute: LandingScreen.routeName,
-        routes: {
-          LandingScreen.routeName: (context) => const LandingScreen(),
-          LoginScreen.routeName: (context) => const LoginScreen(),
-          SignupScreen.routeName: (context) => const SignupScreen(),
-          HomeScreen.routeName: (context) => const HomeScreen(),
-          ChatScreen.routeName: (context) => const ChatScreen(),
-        },
       ),
     );
   }

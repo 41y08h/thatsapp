@@ -1,46 +1,53 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:thatsapp/provider/auth.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fquery/fquery.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thatsapp/screens/home.dart';
 import 'package:thatsapp/utils/api.dart';
 import 'package:thatsapp/widgets/form_input.dart';
 
-class SignupScreen extends StatefulWidget {
+class SignupScreen extends HookWidget {
   static const routeName = "signup";
   const SignupScreen({Key? key}) : super(key: key);
 
   @override
-  _SignupScreenState createState() => _SignupScreenState();
-}
-
-class _SignupScreenState extends State<SignupScreen> {
-  var nameController = TextEditingController();
-  var usernameController = TextEditingController();
-  var passwordController = TextEditingController();
-
-  void onSignupButtonPressed() async {
-    final auth = context.read<AuthProvider>();
-
-    try {
-      await auth.signup(
-        name: nameController.text,
-        username: usernameController.text,
-        password: passwordController.text,
-      );
-      Navigator.of(context)
-          .pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false);
-    } on ApiError catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error.message),
-        ),
-      );
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final nameController = useTextEditingController();
+    final usernameController = useTextEditingController();
+    final passwordController = useTextEditingController();
+    final signupMutation = useMutation<Response, DioError, Map, void>(
+      (data) => dio.post(
+        '/auth/register',
+        data: data,
+      ),
+      onSuccess: (res, variable, ctx) async {
+        final token = res.data['token'];
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString("token", token);
+
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false);
+      },
+      onError: (error, variable, ctx) {
+        final message = error.response!.data['error']['message'];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+          ),
+        );
+      },
+    );
+
+    void onSignupButtonPressed() async {
+      signupMutation.mutate({
+        'name': nameController.text,
+        'username': usernameController.text,
+        'password': passwordController.text
+      });
+    }
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -73,6 +80,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   height: 6,
                 ),
                 FormInput(
+                  isSpaceDenied: true,
                   controller: usernameController,
                   placeholder: "Username",
                 ),
@@ -91,6 +99,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   children: [
                     Expanded(
                       child: CupertinoButton(
+                        disabledColor: Color.fromRGBO(7, 94, 84, 0.56),
                         borderRadius:
                             const BorderRadius.all(Radius.circular(100)),
                         color: Color.fromRGBO(7, 94, 84, 1),

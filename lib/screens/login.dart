@@ -1,87 +1,46 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:provider/provider.dart';
-import 'package:thatsapp/provider/auth.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fquery/fquery.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thatsapp/screens/home.dart';
 import 'package:thatsapp/utils/api.dart';
+import 'package:thatsapp/widgets/form_input.dart';
 
-import '../widgets/form_input.dart';
-
-class Notification {
-  static final _notifications = FlutterLocalNotificationsPlugin();
-
-  static Future _notificationsDetails() async {
-    return const NotificationDetails(
-      android: AndroidNotificationDetails(
-        "channel id",
-        "channel name",
-        channelDescription: "channel description",
-        largeIcon: DrawableResourceAndroidBitmap("app_icon"),
-        styleInformation: MediaStyleInformation(
-          htmlFormatContent: true,
-          htmlFormatTitle: true,
-        ),
-        color: Colors.deepOrange,
-        enableLights: true,
-        enableVibration: true,
-        ongoing: true,
-      ),
-    );
-  }
-
-  static Future initialize() async {
-    _notifications.initialize(const InitializationSettings(
-      android: AndroidInitializationSettings('app_icon'),
-    ));
-  }
-
-  static Future showNofitication({
-    int id = 0,
-    String? title,
-    String? body,
-    String? payload,
-  }) async =>
-      {_notifications.show(id, title, body, await _notificationsDetails())};
-}
-
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends HookWidget {
   static const routeName = 'login';
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  var usernameController = TextEditingController();
-  var passwordController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    Notification.initialize();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    void onLoginButtonPressed() async {
-      // Show a simple notification saying hi
-      final auth = context.read<AuthProvider>();
+    final usernameController = useTextEditingController();
+    final passwordController = useTextEditingController();
+    final loginMutation = useMutation<Response, DioError, Map, void>(
+      (data) => dio.post('/auth/login', data: data),
+      onSuccess: (res, variable, ctx) async {
+        final token = res.data['token'];
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString("token", token);
 
-      try {
-        await auth.authenticate(AuthType.login,
-            username: usernameController.text,
-            password: passwordController.text);
         Navigator.of(context)
             .pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false);
-      } on ApiError catch (error) {
+      },
+      onError: (error, variable, ctx) {
+        final message = error.response!.data['error']['message'];
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(error.message),
+            content: Text(message),
           ),
         );
-      }
+      },
+    );
+
+    void onLoginButtonPressed() async {
+      loginMutation.mutate({
+        'username': usernameController.text,
+        'password': passwordController.text,
+      });
     }
 
     return Scaffold(
@@ -127,7 +86,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderRadius:
                             const BorderRadius.all(Radius.circular(100)),
                         color: Color.fromRGBO(7, 94, 84, 1),
-                        onPressed: onLoginButtonPressed,
+                        onPressed: loginMutation.isPending
+                            ? null
+                            : onLoginButtonPressed,
                         child: const Text(
                           "Sign in",
                           style: TextStyle(

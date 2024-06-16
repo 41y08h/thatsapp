@@ -103,7 +103,9 @@ class SignupScreen extends HookWidget {
                         borderRadius:
                             const BorderRadius.all(Radius.circular(100)),
                         color: Color.fromRGBO(7, 94, 84, 1),
-                        onPressed: onSignupButtonPressed,
+                        onPressed: signupMutation.isPending
+                            ? null
+                            : onSignupButtonPressed,
                         child: const Text(
                           "Sign up",
                           style: TextStyle(

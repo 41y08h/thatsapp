@@ -100,8 +100,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Query<List<Recipient>>("recipients", future: fetchRecipients,
                 builder: (context, response) {
               if (response.error != null) {
+                print(response.error);
                 return Center(
-                  child: Text("Error :("),
+                  child: Text("Error :( "),
                 );
               }
               if (response.loading) {

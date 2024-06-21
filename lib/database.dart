@@ -81,7 +81,6 @@ class DatabaseConnection {
 
   /// Returns a list of [Recipient] (or name if the contact is saved) that are in conversation with the current user.
   Future<List<Recipient>> getRecipients(String username) async {
-    print("object");
     final db = await database;
     final recipients = await db.rawQuery('''
       SELECT coalesce(name, second_person) as name, second_person as username

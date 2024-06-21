@@ -1,5 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import 'package:thatsapp/provider/auth.dart';
 
 const kWebsocketsApiUrl = "http://192.168.0.101:5000";
 
@@ -15,7 +15,8 @@ class SocketConnection {
   Future<IO.Socket> get socket async => _socket ??= await initialize();
 
   Future<IO.Socket> initialize() async {
-    final token = await AuthProvider.getToken();
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString("token");
 
     final options =
         IO.OptionBuilder().setTransports(['websocket']).setExtraHeaders(

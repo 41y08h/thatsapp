@@ -45,10 +45,12 @@ dependencies:
   jwt_decoder: ^2.0.1
   dio: ^4.0.4
   emoji_picker_flutter: ^1.1.2
-  intl: ^0.17.0
+  intl: ^0.19.0
   flutter_requery: ^0.1.14
   flutter_local_notifications: ^9.4.0
   fquery: ^1.4.0-beta.1
+  flutter_form_builder: ^9.3.0
+  form_builder_validators: ^10.0.1
 
 dev_dependencies:
   flutter_test:

@@ -27,7 +27,7 @@ class LoginScreen extends HookWidget {
 
         client.setQueryData(
           ['currentUser'],
-          (t) => User.fromJson(res.data['user']),
+          (t) => User.fromMap(res.data['user']),
         );
 
         Navigator.of(context)

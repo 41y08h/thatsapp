@@ -13,34 +13,18 @@ class ContactsTabView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void onAddContactButtonPressed() {
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        builder: (BuildContext context) {
-          return AddContactDialog(
-            onSubmit: (username, name) async {
-              DatabaseConnection().addContact(name, username);
-              queryCache.invalidateQueries(["contacts", "recipients"]);
-              Navigator.of(context).pop();
-            },
-          );
-        },
-      );
-    }
-
     return Center(
         child: Column(
       children: [
-        TextButton(
-          onPressed: onAddContactButtonPressed,
-          child: const Text("Add Contact"),
-        ),
         Expanded(
           child: ListView.builder(
             itemBuilder: (context, index) {
               final contact = contacts[index];
               return ListTile(
+                leading: Icon(
+                  Icons.account_circle_sharp,
+                  size: 52,
+                ),
                 title: Text(contact.name),
                 subtitle: Text(contact.username),
                 onTap: () {

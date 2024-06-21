@@ -6,6 +6,7 @@ import 'package:fquery/fquery.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thatsapp/screens/home.dart';
 import 'package:thatsapp/utils/api.dart';
+import 'package:thatsapp/utils/user.dart';
 import 'package:thatsapp/widgets/form_input.dart';
 
 class SignupScreen extends HookWidget {
@@ -17,6 +18,7 @@ class SignupScreen extends HookWidget {
     final nameController = useTextEditingController();
     final usernameController = useTextEditingController();
     final passwordController = useTextEditingController();
+    final client = useQueryClient();
     final signupMutation = useMutation<Response, DioError, Map, void>(
       (data) => dio.post(
         '/auth/register',
@@ -26,6 +28,11 @@ class SignupScreen extends HookWidget {
         final token = res.data['token'];
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString("token", token);
+
+        client.setQueryData(
+          ['currentUser'],
+          (t) => User.fromJson(res.data['user']),
+        );
 
         Navigator.of(context)
             .pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false);

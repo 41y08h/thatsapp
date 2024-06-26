@@ -4,12 +4,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:thatsapp/database.dart';
 import 'package:thatsapp/hooks/use_current_user.dart';
 import 'package:thatsapp/models/message.dart';
-import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/utils/recipient.dart';
-import 'package:thatsapp/utils/user.dart';
 import 'package:thatsapp/widgets/message_tile.dart';
 import 'package:thatsapp/socket.dart';
-import 'package:provider/provider.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter_requery/flutter_requery.dart';
 
@@ -78,8 +75,8 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: Query<List<Message>>(
               ["messages", recipient.username],
-              future: () => DatabaseConnection().getChatMessages(
-                  currentUserQuery.data!.username, recipient.username),
+              future: () => DatabaseConnection()
+                  .getChatMessages(currentUser!.username, recipient.username),
               builder: (context, response) {
                 if (response.error != null) {
                   return Center(
@@ -108,7 +105,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     itemBuilder: (context, index) {
                       final message = messages.reversed.toList()[index];
                       final isSentByUser =
-                          message.sender == currentUserQuery.data!.username;
+                          message.sender == currentUser!.username;
 
                       return Align(
                         alignment: isSentByUser

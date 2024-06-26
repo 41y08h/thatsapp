@@ -66,13 +66,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUserQuery = useCurrentUser();
+    final currentUser = useCurrentUser();
     final tabController = useTabController(initialLength: 2);
     final tabIndex = useState(0);
 
     Future<List<Recipient>> fetchRecipients() async {
-      final currentUser = currentUserQuery.data as User;
-      return DatabaseConnection().getRecipients(currentUser.username);
+      return DatabaseConnection().getRecipients(currentUser!.username);
     }
 
     useEffect(() {
@@ -101,14 +100,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   backgroundColor:
                       WidgetStatePropertyAll(Color.fromRGBO(37, 211, 102, 1)),
                   shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                  )),
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.0),
+                    ),
+                  ),
                 ),
                 onPressed: onAddContactButtonPressed,
                 icon: Icon(
                   Icons.add_sharp,
                   size: 36,
+                  color: Colors.grey.shade800,
                 ),
                 padding: EdgeInsets.all(12),
               ),

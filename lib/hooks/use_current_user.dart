@@ -3,7 +3,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thatsapp/utils/user.dart';
 
-UseQueryResult<User?, Error> useCurrentUser() {
+User? useCurrentUser() {
   User _decodeUserFromToken(String token) {
     final decoded = JwtDecoder.decode(token);
     return User.fromMap(decoded);
@@ -34,5 +34,5 @@ UseQueryResult<User?, Error> useCurrentUser() {
     ['currentUser'],
     verifyAndGetUser,
   );
-  return query;
+  return query.data;
 }

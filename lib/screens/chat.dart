@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:thatsapp/database.dart';
+import 'package:thatsapp/hooks/use_current_user.dart';
 import 'package:thatsapp/models/message.dart';
 import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/utils/recipient.dart';
@@ -11,7 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter_requery/flutter_requery.dart';
 
-class ChatScreen extends StatefulWidget {
+class ChatScreen extends StatefulHookWidget {
   static const routeName = 'chat';
   const ChatScreen({Key? key}) : super(key: key);
 
@@ -46,12 +48,12 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final recipient = ModalRoute.of(context)?.settings.arguments as Recipient;
-    final currentUser = context.read<AuthProvider>().currentUser as User;
+    final currentUser = useCurrentUser();
 
     void onSendMessage(String text) async {
       final message = Message(
         text: text,
-        sender: currentUser.username,
+        sender: currentUser!.username,
         receiver: recipient.username,
         createdAt: DateTime.now(),
       );
@@ -70,19 +72,15 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        // Show the username argument in the title
-        title: Text(recipient.name),
-      ),
+      appBar: AppBar(title: Text(recipient.name)),
       body: Column(
-        children: <Widget>[
+        children: [
           Expanded(
             child: Query<List<Message>>(
               ["messages", recipient.username],
-              future: () => DatabaseConnection()
-                  .getChatMessages(currentUser.username, recipient.username),
+              future: () => DatabaseConnection().getChatMessages(
+                  currentUserQuery.data!.username, recipient.username),
               builder: (context, response) {
-                print("gge");
                 if (response.error != null) {
                   return Center(
                     child: Text("Error: ${response.error}"),
@@ -101,8 +99,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   );
                 }
 
-                print("gge");
-
                 final messages = response.data as List<Message>;
                 return Padding(
                   padding: const EdgeInsets.all(8),
@@ -112,7 +108,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     itemBuilder: (context, index) {
                       final message = messages.reversed.toList()[index];
                       final isSentByUser =
-                          message.sender == currentUser.username;
+                          message.sender == currentUserQuery.data!.username;
 
                       return Align(
                         alignment: isSentByUser
@@ -133,8 +129,10 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           // Add a button to send a message
-          MessageKeyboard(
-            onSend: onSendMessage,
+          Expanded(
+            child: MessageKeyboard(
+              onSend: onSendMessage,
+            ),
           ),
         ],
       ),
@@ -181,65 +179,64 @@ class _MessageKeyboardState extends State<MessageKeyboard> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        children: [
-          IconTheme(
-            data: IconThemeData(color: Colors.grey.shade600),
-            child: Container(
-              color: Colors.grey.shade200,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 14),
-              child: Row(
-                children: <Widget>[
-                  isEmojiPickerOpen
-                      ? IconButton(
-                          onPressed: onKeyboardButtonPressed,
-                          icon: Icon(Icons.keyboard))
-                      : IconButton(
-                          onPressed: onEmojiButtonPressed,
-                          icon: Icon(Icons.insert_emoticon)),
-                  Expanded(
-                    child: TextField(
-                      onTap: onTextFieldTapped,
-                      controller: textController,
-                      decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 10.0,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: BorderSide(
-                            width: 0,
-                            style: BorderStyle.none,
-                          ),
-                        ),
-                        filled: true,
-                        hintText: 'Type a message',
-                        fillColor: Colors.white,
+    return Column(
+      children: [
+        IconTheme(
+          data: IconThemeData(color: Colors.grey.shade600),
+          child: Container(
+            color: Colors.grey.shade200,
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 14),
+            child: Row(
+              children: <Widget>[
+                isEmojiPickerOpen
+                    ? IconButton(
+                        onPressed: onKeyboardButtonPressed,
+                        icon: Icon(Icons.keyboard))
+                    : IconButton(
+                        onPressed: onEmojiButtonPressed,
+                        icon: Icon(Icons.insert_emoticon)),
+                Expanded(
+                  child: TextField(
+                    onTap: onTextFieldTapped,
+                    controller: textController,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 10.0,
                       ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                        borderSide: BorderSide(
+                          width: 0,
+                          style: BorderStyle.none,
+                        ),
+                      ),
+                      filled: true,
+                      hintText: 'Type a message',
+                      fillColor: Colors.white,
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.send),
-                    onPressed: onSendMessage,
-                  ),
-                ],
-              ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: onSendMessage,
+                ),
+              ],
             ),
           ),
-          isEmojiPickerOpen
-              ? Expanded(
-                  child: EmojiPicker(
-                    onEmojiSelected: (category, emoji) {
-                      onEmojiSelected(emoji.emoji);
-                    },
-                    onBackspacePressed: onBackspacePressed,
-                  ),
-                )
-              : SizedBox(),
-        ],
-      ),
+        ),
+        isEmojiPickerOpen
+            ? Expanded(
+                child: EmojiPicker(
+                  onEmojiSelected: (category, emoji) {
+                    onEmojiSelected(emoji.emoji);
+                  },
+                  onBackspacePressed: onBackspacePressed,
+                ),
+              )
+            : SizedBox(
+                height: 1,
+              ),
+      ],
     );
   }
 }

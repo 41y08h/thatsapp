@@ -23,9 +23,9 @@ class Message {
       text: json['text'],
       sender: json['sender'],
       receiver: json['receiver'],
-      createdAt: DateTime.parse(json['created_at']),
-      deliveredAt: DateTime.tryParse(json['delivered_at']),
-      readAt: DateTime.tryParse(json['read_at']),
+      createdAt: DateTime.parse(json['created_at'] ?? ""),
+      deliveredAt: DateTime.tryParse(json['delivered_at'] ?? ""),
+      readAt: DateTime.tryParse(json['read_at'] ?? ""),
     );
   }
 

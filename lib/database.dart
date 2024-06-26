@@ -68,7 +68,6 @@ class DatabaseConnection {
   /// Returns a list of [Message] objects for the given [Recipient] username.
   Future<List<Message>> getChatMessages(
       String currentUsername, String recipient) async {
-    print("hey");
     final db = await database;
     final messages = await db.query(
       'Message',

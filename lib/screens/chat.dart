@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fquery/fquery.dart';
 import 'package:thatsapp/database.dart';
 import 'package:thatsapp/hooks/use_current_user.dart';
 import 'package:thatsapp/models/message.dart';
 import 'package:thatsapp/utils/recipient.dart';
 import 'package:thatsapp/widgets/message_tile.dart';
 import 'package:thatsapp/socket.dart';
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
-import 'package:flutter_requery/flutter_requery.dart';
 
 class ChatScreen extends StatefulHookWidget {
   static const routeName = 'chat';
@@ -46,6 +45,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     final recipient = ModalRoute.of(context)?.settings.arguments as Recipient;
     final currentUser = useCurrentUser();
+    final client = useQueryClient();
 
     void onSendMessage(String text) async {
       final message = Message(
@@ -66,6 +66,7 @@ class _ChatScreenState extends State<ChatScreen> {
           "createdAt": message.createdAt.toIso8601String()
         },
       );
+      client.invalidateQueries(['messages', recipient.username]);
     }
 
     return Scaffold(
@@ -73,30 +74,30 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: [
           Expanded(
-            child: Query<List<Message>>(
+            child: QueryBuilder<List<Message>, Error>(
               ["messages", recipient.username],
-              future: () => DatabaseConnection()
+              () => DatabaseConnection()
                   .getChatMessages(currentUser!.username, recipient.username),
-              builder: (context, response) {
-                if (response.error != null) {
+              builder: (context, query) {
+                if (query.isError) {
                   return Center(
-                    child: Text("Error: ${response.error}"),
+                    child: Text("Error: ${query.error}"),
                   );
                 }
 
-                if (response.loading) {
-                  return Center(
+                if (query.isLoading) {
+                  return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
 
-                if (response.data == null) {
-                  return Center(
+                if (query.data == null) {
+                  return const Center(
                     child: Text("No messages"),
                   );
                 }
 
-                final messages = response.data as List<Message>;
+                final messages = query.data as List<Message>;
                 return Padding(
                   padding: const EdgeInsets.all(8),
                   child: ListView.separated(
@@ -118,7 +119,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       );
                     },
                     separatorBuilder: (context, index) {
-                      return SizedBox(height: 4);
+                      return const SizedBox(height: 4);
                     },
                   ),
                 );
@@ -126,10 +127,8 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           // Add a button to send a message
-          Expanded(
-            child: MessageKeyboard(
-              onSend: onSendMessage,
-            ),
+          MessageKeyboard(
+            onSend: onSendMessage,
           ),
         ],
       ),
@@ -137,64 +136,31 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
-class MessageKeyboard extends StatefulWidget {
+class MessageKeyboard extends HookWidget {
   final void Function(String message) onSend;
   const MessageKeyboard({Key? key, required this.onSend}) : super(key: key);
 
   @override
-  State<MessageKeyboard> createState() => _MessageKeyboardState();
-}
-
-class _MessageKeyboardState extends State<MessageKeyboard> {
-  TextEditingController textController = TextEditingController();
-  bool isEmojiPickerOpen = false;
-
-  void onEmojiButtonPressed() {
-    setState(() {
-      isEmojiPickerOpen = true;
-    });
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
-
-  void onKeyboardButtonPressed() {
-    setState(() {
-      isEmojiPickerOpen = false;
-    });
-    SystemChannels.textInput.invokeMethod('TextInput.show');
-  }
-
-  void onTextFieldTapped() {}
-
-  void onEmojiSelected(String emoji) {}
-
-  void onBackspacePressed() {}
-
-  void onSendMessage() {
-    widget.onSend(textController.text);
-    textController.clear();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final textController = useTextEditingController();
+
+    void onSendMessage() {
+      onSend(textController.text);
+      textController.clear();
+    }
+
     return Column(
       children: [
         IconTheme(
           data: IconThemeData(color: Colors.grey.shade600),
           child: Container(
             color: Colors.grey.shade200,
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 14),
+            padding: const EdgeInsets.only(left: 14.0, top: 16, bottom: 16),
             child: Row(
-              children: <Widget>[
-                isEmojiPickerOpen
-                    ? IconButton(
-                        onPressed: onKeyboardButtonPressed,
-                        icon: Icon(Icons.keyboard))
-                    : IconButton(
-                        onPressed: onEmojiButtonPressed,
-                        icon: Icon(Icons.insert_emoticon)),
+              children: [
                 Expanded(
                   child: TextField(
-                    onTap: onTextFieldTapped,
+                    onTap: () {},
                     controller: textController,
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.symmetric(
@@ -202,7 +168,7 @@ class _MessageKeyboardState extends State<MessageKeyboard> {
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10.0),
-                        borderSide: BorderSide(
+                        borderSide: const BorderSide(
                           width: 0,
                           style: BorderStyle.none,
                         ),
@@ -221,18 +187,6 @@ class _MessageKeyboardState extends State<MessageKeyboard> {
             ),
           ),
         ),
-        isEmojiPickerOpen
-            ? Expanded(
-                child: EmojiPicker(
-                  onEmojiSelected: (category, emoji) {
-                    onEmojiSelected(emoji.emoji);
-                  },
-                  onBackspacePressed: onBackspacePressed,
-                ),
-              )
-            : SizedBox(
-                height: 1,
-              ),
       ],
     );
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
 import 'package:provider/provider.dart';
@@ -94,40 +95,44 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       floatingActionButton: tabIndex.value == 1
           ? Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: IconButton.filled(
-                style: ButtonStyle(
-                  backgroundColor:
-                      WidgetStatePropertyAll(Color.fromRGBO(37, 211, 102, 1)),
-                  shape: WidgetStateProperty.all<RoundedRectangleBorder>(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14.0),
+              padding: const EdgeInsets.all(12.0),
+              child: SizedBox(
+                height: 50,
+                width: 50,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    padding: const WidgetStatePropertyAll(EdgeInsets.all(12)),
+                    backgroundColor: const WidgetStatePropertyAll(
+                        Color.fromRGBO(37, 211, 102, 1)),
+                    shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14.0),
+                      ),
                     ),
                   ),
+                  onPressed: onAddContactButtonPressed,
+                  child: const Icon(
+                    Icons.add_sharp,
+                    size: 24,
+                    color: Colors.white,
+                  ),
                 ),
-                onPressed: onAddContactButtonPressed,
-                icon: Icon(
-                  Icons.add_sharp,
-                  size: 36,
-                  color: Colors.grey.shade800,
-                ),
-                padding: EdgeInsets.all(12),
               ),
             )
           : null,
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(7, 94, 84, 1),
+        backgroundColor: const Color.fromRGBO(7, 94, 84, 1),
         foregroundColor: Colors.white,
         title: const Text("ThatsApp"),
         bottom: TabBar(
           controller: tabController,
           tabs: [
-            Tab(
+            const Tab(
                 icon: Icon(
               Icons.chat,
               color: Colors.white,
             )),
-            Tab(icon: Icon(Icons.group, color: Colors.white)),
+            const Tab(icon: Icon(Icons.group, color: Colors.white)),
           ],
         ),
         actions: [
@@ -142,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.of(context).pushNamedAndRemoveUntil(
                   LoginScreen.routeName, (route) => false);
             },
-            icon: Icon(Icons.login),
+            icon: const Icon(Icons.login),
           ),
         ],
       ),

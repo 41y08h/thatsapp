@@ -57,11 +57,10 @@ class FormInput extends StatelessWidget {
                 height: 4,
               ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
                     state.errorText ?? "",
-                    style: const TextStyle(color: Colors.red),
+                    style: const TextStyle(color: Colors.red, fontSize: 10),
                   ),
                 ],
               ),

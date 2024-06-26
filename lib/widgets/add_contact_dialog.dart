@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:thatsapp/widgets/form_input.dart';
@@ -15,38 +17,39 @@ class AddContactDialog extends HookWidget {
   Widget build(BuildContext context) {
     final usernameController = useTextEditingController();
     final nameController = useTextEditingController();
-    final _formKey = GlobalKey<FormState>();
+    final _formKey = useRef(GlobalKey<FormState>());
 
     return SingleChildScrollView(
       padding: MediaQuery.of(context).viewInsets,
       child: Form(
-        key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        key: _formKey.value,
         child: Padding(
           padding: const EdgeInsets.all(28),
           child: Column(
             children: [
               FormInput(
+                borderRadius: 8,
                 autofocus: true,
                 controller: nameController,
-                placeholder: "Name",
-                borderRadius: 8,
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
-                  FormBuilderValidators.min(3),
+                  FormBuilderValidators.minLength(3),
                 ]),
+                placeholder: "Name",
               ),
               const SizedBox(
                 height: 6,
               ),
               FormInput(
-                controller: usernameController,
-                placeholder: "Username",
-                isSpaceDenied: true,
                 borderRadius: 8,
+                isSpaceDenied: true,
+                controller: usernameController,
                 validator: FormBuilderValidators.compose([
                   FormBuilderValidators.required(),
-                  FormBuilderValidators.min(3),
+                  FormBuilderValidators.minLength(3),
                 ]),
+                placeholder: "Username",
               ),
               const SizedBox(
                 height: 10,
@@ -68,7 +71,7 @@ class AddContactDialog extends HookWidget {
                         )),
                       ),
                       onPressed: () {
-                        final isValid = _formKey.currentState!.validate();
+                        final isValid = _formKey.value.currentState!.validate();
                         if (isValid) {
                           onSubmit(
                               usernameController.text, nameController.text);

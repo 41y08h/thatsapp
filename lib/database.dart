@@ -5,7 +5,7 @@ import 'package:thatsapp/models/message.dart';
 import 'package:thatsapp/utils/recipient.dart';
 
 class DatabaseConnection {
-  static const _filename = 'thatsapp_database12.db';
+  static const _filename = 'thatsapp_database13.db';
   static final DatabaseConnection _instance = DatabaseConnection._();
   DatabaseConnection._();
 
@@ -100,9 +100,10 @@ class DatabaseConnection {
   }
 
   /// Adds a contact to the database.
-  Future<void> addContact(String name, String username) async {
+  Future<Contact> addContact(String name, String username) async {
     final db = await database;
     await db.insert('Contact', {'name': name, 'username': username});
+    return Contact(name: name, username: username);
   }
 
   Future<List<Contact>> getContacts() async {

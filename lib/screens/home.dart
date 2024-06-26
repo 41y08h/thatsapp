@@ -87,13 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
         context: context,
         isScrollControlled: true,
         builder: (BuildContext context) {
-          return AddContactDialog(
-            onSubmit: (username, name) async {
-              DatabaseConnection().addContact(name, username);
-              queryCache.invalidateQueries(["contacts", "recipients"]);
-              Navigator.of(context).pop();
-            },
-          );
+          return const AddContactDialog();
         },
       );
     }
@@ -171,21 +165,21 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
-          Query<List<Contact>>(
-            "contacts",
-            future: DatabaseConnection().getContacts,
-            builder: (context, response) {
-              if (response.error != null) {
-                return Center(
+          QueryBuilder<List<Contact>, Error>(
+            const ["contacts"],
+            DatabaseConnection().getContacts,
+            builder: (context, query) {
+              if (query.isError) {
+                return const Center(
                   child: Text("Error :("),
                 );
               }
-              if (response.loading) {
-                return Center(
+              if (query.isLoading) {
+                return const Center(
                   child: CircularProgressIndicator(),
                 );
               }
-              return ContactsTabView(contacts: response.data as List<Contact>);
+              return ContactsTabView(contacts: query.data as List<Contact>);
             },
           )
         ],

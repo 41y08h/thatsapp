@@ -1,28 +1,62 @@
-import 'package:flutter/cupertino.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:fquery/fquery.dart';
+
+import 'package:thatsapp/database.dart';
+import 'package:thatsapp/models/contact.dart';
 import 'package:thatsapp/widgets/form_input.dart';
 
+class AddContactVariable {
+  final String name;
+  final String username;
+  AddContactVariable({
+    required this.name,
+    required this.username,
+  });
+}
+
 class AddContactDialog extends HookWidget {
-  final Function(String username, String name) onSubmit;
-  const AddContactDialog({
-    Key? key,
-    required this.onSubmit,
-  }) : super(key: key);
+  const AddContactDialog({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final usernameController = useTextEditingController();
     final nameController = useTextEditingController();
     final _formKey = useRef(GlobalKey<FormState>());
+    final client = useQueryClient();
+
+    final addContactMutation =
+        useMutation<Contact, Error, AddContactVariable, void>(
+      (variable) => DatabaseConnection().addContact(
+        variable.name,
+        variable.username,
+      ),
+      onSuccess: (data, variable, ctx) {
+        client.invalidateQueries(['contacts']);
+        client.invalidateQueries(['recipients']);
+
+        Navigator.of(context).pop();
+      },
+    );
+
+    void onSubmit() async {
+      final isValid = _formKey.value.currentState!.validate();
+      if (!isValid) return;
+
+      addContactMutation.mutate(
+        AddContactVariable(
+          name: nameController.text,
+          username: usernameController.text,
+        ),
+      );
+    }
 
     return SingleChildScrollView(
       padding: MediaQuery.of(context).viewInsets,
       child: Form(
-        autovalidateMode: AutovalidateMode.onUserInteraction,
         key: _formKey.value,
         child: Padding(
           padding: const EdgeInsets.all(28),
@@ -70,13 +104,7 @@ class AddContactDialog extends HookWidget {
                           ),
                         )),
                       ),
-                      onPressed: () {
-                        final isValid = _formKey.value.currentState!.validate();
-                        if (isValid) {
-                          onSubmit(
-                              usernameController.text, nameController.text);
-                        }
-                      },
+                      onPressed: addContactMutation.isPending ? null : onSubmit,
                       child: const Text("Add"),
                     ),
                   ),

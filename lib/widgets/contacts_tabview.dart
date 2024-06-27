@@ -3,7 +3,7 @@ import 'package:flutter_requery/flutter_requery.dart';
 import 'package:provider/provider.dart';
 import 'package:thatsapp/database.dart';
 import 'package:thatsapp/models/contact.dart';
-import 'package:thatsapp/utils/recipient.dart';
+import 'package:thatsapp/models/recipient.dart';
 import 'package:thatsapp/widgets/add_contact_dialog.dart';
 import 'package:thatsapp/screens/chat.dart';
 

@@ -2,7 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
 import 'package:thatsapp/models/contact.dart';
 import 'package:thatsapp/models/message.dart';
-import 'package:thatsapp/utils/recipient.dart';
+import 'package:thatsapp/models/recipient.dart';
 
 class DatabaseConnection {
   static const _filename = 'thatsapp_database13.db';

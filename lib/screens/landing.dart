@@ -5,7 +5,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thatsapp/screens/home.dart';
 import 'package:thatsapp/screens/login.dart';
-import 'package:thatsapp/utils/user.dart';
+import 'package:thatsapp/models/user.dart';
 
 class LandingScreen extends HookWidget {
   static const routeName = '/';

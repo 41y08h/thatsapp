@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:thatsapp/models/message.dart';
-import 'package:thatsapp/provider/auth.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 class MessageTile extends StatelessWidget {
@@ -17,14 +15,14 @@ class MessageTile extends StatelessWidget {
 
     return LayoutBuilder(builder: (context, constraints) {
       return Container(
-        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-            color: isSentByUser ? Color(0xffD9FDD3) : Colors.white,
+            color: isSentByUser ? const Color(0xffD9FDD3) : Colors.white,
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(isSentByUser ? 10 : 0),
               topRight: Radius.circular(isSentByUser ? 0 : 10),
-              bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10),
+              bottomLeft: const Radius.circular(10),
+              bottomRight: const Radius.circular(10),
             ),
             boxShadow: [
               BoxShadow(
@@ -37,12 +35,12 @@ class MessageTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(message.text),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
             Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: Text(
                 DateFormat('hh:mm a').format(message.createdAt).toLowerCase(),
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ),
             Visibility(

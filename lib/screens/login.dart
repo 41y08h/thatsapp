@@ -6,7 +6,7 @@ import 'package:fquery/fquery.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thatsapp/screens/home.dart';
 import 'package:thatsapp/utils/api.dart';
-import 'package:thatsapp/utils/user.dart';
+import 'package:thatsapp/models/user.dart';
 import 'package:thatsapp/widgets/form_input.dart';
 
 class LoginScreen extends HookWidget {

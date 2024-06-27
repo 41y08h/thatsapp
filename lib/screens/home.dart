@@ -1,17 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thatsapp/database.dart';
 import 'package:thatsapp/hooks/use_current_user.dart';
 import 'package:thatsapp/models/contact.dart';
 import 'package:thatsapp/models/message.dart';
-import 'package:thatsapp/provider/auth.dart';
 import 'package:thatsapp/screens/login.dart';
-import 'package:thatsapp/utils/recipient.dart';
-import 'package:thatsapp/utils/user.dart';
+import 'package:thatsapp/models/recipient.dart';
 import 'package:thatsapp/widgets/add_contact_dialog.dart';
 import 'package:thatsapp/widgets/contacts_tabview.dart';
 import 'package:thatsapp/socket.dart';
@@ -126,13 +122,13 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text("ThatsApp"),
         bottom: TabBar(
           controller: tabController,
-          tabs: [
-            const Tab(
+          tabs: const [
+            Tab(
                 icon: Icon(
               Icons.chat,
               color: Colors.white,
             )),
-            const Tab(icon: Icon(Icons.group, color: Colors.white)),
+            Tab(icon: Icon(Icons.group, color: Colors.white)),
           ],
         ),
         actions: [
@@ -141,9 +137,10 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {},
           ),
           IconButton(
-            onPressed: () {
+            onPressed: () async {
               // Navigate to login page
-              context.read<AuthProvider>().logout();
+              final prefs = await SharedPreferences.getInstance();
+              prefs.remove("token");
               Navigator.of(context).pushNamedAndRemoveUntil(
                   LoginScreen.routeName, (route) => false);
             },
@@ -155,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
         controller: tabController,
         children: [
           QueryBuilder<List<Recipient>, Error>(
-            ["recipients"],
+            const ["recipients"],
             fetchRecipients,
             builder: (context, response) {
               if (response.error != null) {

@@ -1,7 +1,7 @@
 import 'package:fquery/fquery.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:thatsapp/utils/user.dart';
+import 'package:thatsapp/models/user.dart';
 
 User? useCurrentUser() {
   User _decodeUserFromToken(String token) {

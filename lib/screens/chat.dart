@@ -5,7 +5,7 @@ import 'package:fquery/fquery.dart';
 import 'package:thatsapp/database.dart';
 import 'package:thatsapp/hooks/use_current_user.dart';
 import 'package:thatsapp/models/message.dart';
-import 'package:thatsapp/utils/recipient.dart';
+import 'package:thatsapp/models/recipient.dart';
 import 'package:thatsapp/widgets/message_tile.dart';
 import 'package:thatsapp/socket.dart';
 
@@ -126,10 +126,7 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             ),
           ),
-          // Add a button to send a message
-          MessageKeyboard(
-            onSend: onSendMessage,
-          ),
+          MessageKeyboard(onSend: onSendMessage),
         ],
       ),
     );

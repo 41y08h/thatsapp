@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:thatsapp/screens/chat.dart';
-import 'package:thatsapp/utils/recipient.dart';
+import 'package:thatsapp/models/recipient.dart';
 
 class ConversationsTabView extends StatelessWidget {
   final List<Recipient> recipients;

@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_requery/flutter_requery.dart';
-import 'package:provider/provider.dart';
-import 'package:thatsapp/database.dart';
 import 'package:thatsapp/models/contact.dart';
 import 'package:thatsapp/models/recipient.dart';
-import 'package:thatsapp/widgets/add_contact_dialog.dart';
 import 'package:thatsapp/screens/chat.dart';
 
 class ContactsTabView extends StatelessWidget {
@@ -21,7 +17,7 @@ class ContactsTabView extends StatelessWidget {
             itemBuilder: (context, index) {
               final contact = contacts[index];
               return ListTile(
-                leading: Icon(
+                leading: const Icon(
                   Icons.account_circle_sharp,
                   size: 52,
                 ),

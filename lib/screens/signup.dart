@@ -106,10 +106,10 @@ class SignupScreen extends HookWidget {
                   children: [
                     Expanded(
                       child: CupertinoButton(
-                        disabledColor: Color.fromRGBO(7, 94, 84, 0.56),
+                        disabledColor: const Color.fromRGBO(7, 94, 84, 0.56),
                         borderRadius:
                             const BorderRadius.all(Radius.circular(100)),
-                        color: Color.fromRGBO(7, 94, 84, 1),
+                        color: const Color.fromRGBO(7, 94, 84, 1),
                         onPressed: signupMutation.isPending
                             ? null
                             : onSignupButtonPressed,

@@ -92,7 +92,7 @@ class LoginScreen extends HookWidget {
                       child: CupertinoButton(
                         borderRadius:
                             const BorderRadius.all(Radius.circular(100)),
-                        color: Color.fromRGBO(7, 94, 84, 1),
+                        color: const Color.fromRGBO(7, 94, 84, 1),
                         onPressed: loginMutation.isPending
                             ? null
                             : onLoginButtonPressed,

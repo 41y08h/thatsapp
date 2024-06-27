@@ -3,7 +3,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thatsapp/database.dart';
-import 'package:thatsapp/hooks/use_current_user.dart';
+import 'package:thatsapp/hooks/use_auth.dart';
 import 'package:thatsapp/models/contact.dart';
 import 'package:thatsapp/models/message.dart';
 import 'package:thatsapp/screens/login.dart';
@@ -63,12 +63,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = useCurrentUser();
+    final auth = useAuth();
     final tabController = useTabController(initialLength: 2);
     final tabIndex = useState(0);
 
     Future<List<Recipient>> fetchRecipients() async {
-      return DatabaseConnection().getRecipients(currentUser!.username);
+      return DatabaseConnection().getRecipients(auth.currentUser!.username);
     }
 
     useEffect(() {

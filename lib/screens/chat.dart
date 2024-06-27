@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fquery/fquery.dart';
 import 'package:thatsapp/database.dart';
-import 'package:thatsapp/hooks/use_current_user.dart';
+import 'package:thatsapp/hooks/use_auth.dart';
 import 'package:thatsapp/models/message.dart';
 import 'package:thatsapp/models/recipient.dart';
 import 'package:thatsapp/widgets/message_tile.dart';
@@ -44,13 +44,13 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final recipient = ModalRoute.of(context)?.settings.arguments as Recipient;
-    final currentUser = useCurrentUser();
+    final auth = useAuth();
     final client = useQueryClient();
 
     void onSendMessage(String text) async {
       final message = Message(
         text: text,
-        sender: currentUser!.username,
+        sender: auth.currentUser!.username,
         receiver: recipient.username,
         createdAt: DateTime.now(),
       );
@@ -76,8 +76,8 @@ class _ChatScreenState extends State<ChatScreen> {
           Expanded(
             child: QueryBuilder<List<Message>, Error>(
               ["messages", recipient.username],
-              () => DatabaseConnection()
-                  .getChatMessages(currentUser!.username, recipient.username),
+              () => DatabaseConnection().getChatMessages(
+                  auth.currentUser!.username, recipient.username),
               builder: (context, query) {
                 if (query.isError) {
                   return Center(
@@ -106,7 +106,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     itemBuilder: (context, index) {
                       final message = messages.reversed.toList()[index];
                       final isSentByUser =
-                          message.sender == currentUser!.username;
+                          message.sender == auth.currentUser!.username;
 
                       return Align(
                         alignment: isSentByUser
